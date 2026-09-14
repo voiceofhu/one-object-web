@@ -1,4 +1,3 @@
-import { BrandLogo, BrandSettings } from "@/components/brand-settings"
 import { useLocalAtom } from "@/hooks/use-local-atom"
 import { useObjectTranslation } from "@/local/object"
 
@@ -156,7 +155,8 @@ export function AppShell() {
                 className="data-[slot=sidebar-menu-button]:p-1.5!"
               >
                 <Link to="/dashboard" aria-label={t("app.name")}>
-                  <BrandLogo
+                  <img
+                    src="/one-object-logo.svg"
                     alt=""
                     aria-hidden="true"
                     className="size-6 rounded-md object-contain"
@@ -168,7 +168,6 @@ export function AppShell() {
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
-          <BrandSettings />
         </SidebarHeader>
         <SidebarContent>
           {navigationGroups.map((group) => (

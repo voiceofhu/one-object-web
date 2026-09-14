@@ -7,6 +7,7 @@ import {
   EllipsisVerticalIcon,
   LogInIcon,
   LogOutIcon,
+  UsersRoundIcon,
 } from "lucide-react"
 
 import { lazy, Suspense } from "react"
@@ -73,13 +74,13 @@ export function SessionIdentity({ session }: { session: SessionQuery }) {
     user?.display_name,
   )
   const logoutMutation = useMutation({
-    mutationFn: logout,
+    mutationFn: (_switchAccount: boolean) => logout(),
     onError: (error) =>
       toast.error(t("account.logoutError"), {
         description: error.message,
       }),
-    onSuccess: () => {
-      window.location.replace("/")
+    onSuccess: (_data, switchAccount) => {
+      window.location.replace(switchAccount ? "/api/auth/oidc/start" : "/")
     },
   })
 
@@ -154,6 +155,13 @@ export function SessionIdentity({ session }: { session: SessionQuery }) {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   disabled={logoutMutation.isPending}
+                  onSelect={() => logoutMutation.mutate(true)}
+                >
+                  <UsersRoundIcon />
+                  {t("account.switchAccount")}
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  disabled={logoutMutation.isPending}
                   onSelect={() => setLogoutDialogOpen(true)}
                   variant="destructive"
                 >
@@ -180,7 +188,7 @@ export function SessionIdentity({ session }: { session: SessionQuery }) {
           <ResponsiveDialogContent className="sm:max-w-[25rem]">
             <ResponsiveDialogHeader className="px-5 py-4 pr-12">
               <ResponsiveDialogTitle>
-                {locale === "zh-CN" ? "退出登录" : "Sign out"}
+                {t("account.logout")}
               </ResponsiveDialogTitle>
             </ResponsiveDialogHeader>
             <ResponsiveDialogBody className="px-5 py-4">
@@ -206,7 +214,7 @@ export function SessionIdentity({ session }: { session: SessionQuery }) {
                 aria-busy={logoutMutation.isPending}
                 className="min-w-24"
                 disabled={logoutMutation.isPending}
-                onClick={() => logoutMutation.mutate()}
+                onClick={() => logoutMutation.mutate(false)}
                 type="button"
                 variant="destructive"
               >

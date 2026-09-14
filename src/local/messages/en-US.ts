@@ -136,7 +136,8 @@ export const enUS = {
   "account.userId": "User ID",
   "account.email": "Email",
   "account.emailMissing": "Not set",
-  "account.logout": "Sign out",
+  "account.logout": "Sign out of this app",
+  "account.switchAccount": "Switch account",
   "account.logoutError": "Sign-out failed",
   "account.signedOut": "You are signed out",
   "account.signedOutDescription":
