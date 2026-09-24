@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 
-
 import { Button } from "@/components/ui/button"
 import { SweepShine } from "@/components/sweep-shine"
 
@@ -30,7 +29,7 @@ export function AppUpdateChecker() {
     try {
       const workerUrl = new URL(
         `${import.meta.env.BASE_URL}app-update-checker.worker.js`,
-        window.location.origin
+        window.location.origin,
       )
       worker = new Worker(workerUrl, {
         name: "app-update-checker",
@@ -54,7 +53,7 @@ export function AppUpdateChecker() {
     }
 
     const handleWorkerMessage = (
-      event: MessageEvent<AppUpdateCheckerWorkerMessage>
+      event: MessageEvent<AppUpdateCheckerWorkerMessage>,
     ) => {
       if (event.data?.type === "changed") {
         setUpdateAvailable(true)
@@ -121,9 +120,9 @@ export function AppUpdateChecker() {
             >
               <SweepShine
                 active={isPending}
-                className={isPending ? 'text-primary-foreground/70' : undefined}
+                className={isPending ? "text-primary-foreground/70" : undefined}
               >
-                {isPending ? '正在更新…' : '更新'}
+                {isPending ? "正在更新…" : "更新"}
               </SweepShine>
             </Button>
             <Button

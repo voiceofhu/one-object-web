@@ -36,7 +36,10 @@ export function Failure({
       description: `${tx(error.message)}${error instanceof ApiError ? ` (HTTP ${error.status})` : ""}`,
       action:
         error instanceof ApiError && error.status === 401
-          ? { label: tx("重新登录"), onClick: () => window.location.assign("/api/auth/oidc/start") }
+          ? {
+              label: tx("重新登录"),
+              onClick: () => window.location.assign("/api/auth/oidc/start"),
+            }
           : retryRef.current
             ? { label: tx("重试"), onClick: () => retryRef.current?.() }
             : undefined,

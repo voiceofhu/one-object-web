@@ -15,8 +15,10 @@ export function AdminErrorAlert({ error }: { error: unknown }) {
     if (!error) return
     toast.error(tx("操作未完成"), {
       id,
-      description: `${details?.message ||
-        (error instanceof Error ? tx(error.message) : tx("请求失败，请重试"))}${error instanceof HttpError ? ` (HTTP ${error.status})` : ""}`,
+      description: `${
+        details?.message ||
+        (error instanceof Error ? tx(error.message) : tx("请求失败，请重试"))
+      }${error instanceof HttpError ? ` (HTTP ${error.status})` : ""}`,
     })
   }, [details?.message, error, id, tx])
 
