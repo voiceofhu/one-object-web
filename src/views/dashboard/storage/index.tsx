@@ -13,7 +13,7 @@ import {
   Trash2Icon,
 } from "lucide-react"
 import { type ColumnDef } from "@tanstack/react-table"
-import { ResourceTable } from "@/views/dashboard/admin/components/shared/resource-table"
+import { ResourceTable } from "@/components/resource-table"
 import { Switch } from "@/components/ui/switch"
 import {
   DropdownMenu,

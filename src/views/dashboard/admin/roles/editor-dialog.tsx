@@ -29,13 +29,13 @@ import {
   updateRole,
   type IdentityPermission,
 } from "@/views/dashboard/admin/api/rbac-api"
-import { AdminErrorAlert } from "@/views/dashboard/admin/components/shared/common"
-import { isSuperAdminRole } from "@/views/dashboard/admin/components/roles/helpers"
-import { PermissionTree } from "@/views/dashboard/admin/components/roles/permissions-dialog"
+import { AdminErrorAlert } from "@/views/dashboard/admin/shared/common"
+import { isSuperAdminRole } from "@/views/dashboard/admin/roles/helpers"
+import { PermissionTree } from "@/views/dashboard/admin/roles/permissions-dialog"
 import type {
   RoleDialog,
   RoleEditorValues,
-} from "@/views/dashboard/admin/components/roles/types"
+} from "@/views/dashboard/admin/roles/types"
 
 export function RoleEditorDialog({
   dialog,

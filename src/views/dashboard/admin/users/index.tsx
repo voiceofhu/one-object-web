@@ -30,25 +30,13 @@ import { useTranslation } from "@/components/providers/language-context"
 import { useCurrentTime } from "@/hooks/use-current-time"
 import { relativeTime } from "@/lib/format"
 import { UserRowActions } from "./row-actions"
-import { updateUser } from "./api"
+import { createUser, deleteUser, listUsers, updateUser, type User } from "./api"
 import { useLocalAtom } from "@/hooks/use-local-atom"
-import { rootRequest } from "@/lib/request"
-import { ResourceTable } from "../shared/resource-table"
+import { ResourceTable } from "@/components/resource-table"
 import { AdminErrorAlert } from "../shared/common"
-import { listRoles, rbacQueryKeys, assignUserRoles } from "../../api/rbac-api"
+import { listRoles, rbacQueryKeys, assignUserRoles } from "../api/rbac-api"
 import { authPermissionsQuery } from "@/views/dashboard/account/permissions-api"
 import { formatAdminTime } from "../shared/format"
-type User = {
-  user_id: string
-  oidc_sub: string
-  display_name: string
-  avatar_url: string | null
-  email: string | null
-  status: "active" | "disabled" | "deleted"
-  role_ids: string[]
-  created_at: string
-}
-type UserPage = { items: User[]; total: number; limit: number }
 type Editor = {
   kind: "create" | "edit" | "roles" | "delete" | "disable"
   user?: User
@@ -74,8 +62,7 @@ export function UsersPanel({ permissions }: { permissions: string[] }) {
   const users = useInfiniteQuery({
     queryKey: ["object-admin", "users"],
     initialPageParam: 0,
-    queryFn: ({ pageParam }) =>
-      rootRequest<UserPage>(`/api/admin/users?offset=${pageParam}`),
+    queryFn: ({ pageParam }) => listUsers(pageParam),
     getNextPageParam: (page, all) => {
       const n = all.reduce((sum, p) => sum + p.items.length, 0)
       return n < page.total ? n : undefined
@@ -338,17 +325,10 @@ function UserDialog({
   })
   const mutation = useMutation({
     mutationFn: async () => {
-      if (editor.kind === "create")
-        return rootRequest("/api/admin/users", {
-          method: "POST",
-          body: JSON.stringify({ oidc_sub: sub, display_name: name }),
-        })
+      if (editor.kind === "create") return createUser(sub, name)
       if (editor.kind === "roles")
         return assignUserRoles(editor.user!.user_id, selected)
-      if (editor.kind === "delete")
-        return rootRequest(`/api/admin/users/${editor.user!.user_id}`, {
-          method: "DELETE",
-        })
+      if (editor.kind === "delete") return deleteUser(editor.user!.user_id)
       return updateUser(
         { user_id: editor.user!.user_id, display_name: name },
         status,

@@ -25,8 +25,8 @@ import {
   type IdentityPermission,
   type IdentityRole,
 } from "@/views/dashboard/admin/api/rbac-api"
-import { AdminErrorAlert } from "@/views/dashboard/admin/components/shared/common"
-import { isSuperAdminRole } from "@/views/dashboard/admin/components/roles/helpers"
+import { AdminErrorAlert } from "@/views/dashboard/admin/shared/common"
+import { isSuperAdminRole } from "@/views/dashboard/admin/roles/helpers"
 import {
   buildPermissionNodeMap,
   buildPermissionTree,
@@ -37,7 +37,7 @@ import {
   removeEmptyPermissionAncestors,
   type PermissionCheckedState,
   type PermissionNode,
-} from "@/views/dashboard/admin/components/permissions/tree"
+} from "@/views/dashboard/admin/permissions/tree"
 
 export function RolePermissionDialog({
   role,

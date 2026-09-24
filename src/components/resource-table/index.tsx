@@ -40,20 +40,17 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { cn } from "@/lib/utils"
-import { ResourceTableFooter } from "@/views/dashboard/admin/components/shared/resource-table/footer"
+import { ResourceTableFooter } from "@/components/resource-table/footer"
 import {
   ResourceTableDragHandle,
   SortableResourceTableRow,
   TreeCell,
-} from "@/views/dashboard/admin/components/shared/resource-table/parts"
-import {
-  countRows,
-  getColumnMeta,
-} from "@/views/dashboard/admin/components/shared/resource-table/helpers"
+} from "@/components/resource-table/parts"
+import { countRows, getColumnMeta } from "@/components/resource-table/helpers"
 import {
   ResourceTableToolbar,
   type ResourceTableFilterOption,
-} from "@/views/dashboard/admin/components/shared/resource-table/toolbar"
+} from "@/components/resource-table/toolbar"
 
 type StatusFilter = "all" | "active" | "disabled"
 

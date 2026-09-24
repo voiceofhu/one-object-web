@@ -2,23 +2,11 @@ import { useObjectTranslation } from "@/local/object"
 import { useInfiniteQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import type { ColumnDef } from "@tanstack/react-table"
-import { rootRequest } from "@/lib/request"
+import { listLogs, type Log } from "./api"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { ResourceTable } from "../shared/resource-table"
+import { ResourceTable } from "@/components/resource-table"
 import { formatAdminTime } from "../shared/format"
-type Log = {
-  id: string
-  owner_sub: string | null
-  app_id?: string | null
-  status: number
-  success?: boolean
-  method?: string
-  route?: string
-  duration_ms?: number
-  peer_ip: string | null
-  created_at: string
-}
 export function LogsPanel({ kind }: { kind: "login" | "operation" }) {
   const tx = useObjectTranslation()
 
@@ -27,10 +15,7 @@ export function LogsPanel({ kind }: { kind: "login" | "operation" }) {
   const logs = useInfiniteQuery({
     queryKey: ["object-admin", `${kind}-logs`],
     initialPageParam: 0,
-    queryFn: ({ pageParam }) =>
-      rootRequest<{ items: Log[]; total: number }>(
-        `/api/admin/${kind}-logs?offset=${pageParam}`,
-      ),
+    queryFn: ({ pageParam }) => listLogs(kind, pageParam),
     getNextPageParam: (page, all) => {
       const n = all.reduce((sum, p) => sum + p.items.length, 0)
       return n < page.total ? n : undefined

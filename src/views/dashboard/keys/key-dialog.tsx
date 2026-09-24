@@ -36,7 +36,7 @@ import {
   ResponsiveDialogTitle,
 } from "@/components/ui/responsive-dialog"
 import { createKey, keyScopes, updateKey, type AppKey } from "./api"
-import { AdminErrorAlert } from "@/views/dashboard/admin/components/shared/common"
+import { AdminErrorAlert } from "@/views/dashboard/admin/shared/common"
 
 const schema = z.object({
   logo: z.string().nullable(),

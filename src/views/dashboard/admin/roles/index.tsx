@@ -14,18 +14,18 @@ import {
   updateRole,
   type IdentityRole,
 } from "@/views/dashboard/admin/api/rbac-api"
-import { AdminErrorAlert } from "@/views/dashboard/admin/components/shared/common"
-import { ResourceTable } from "@/views/dashboard/admin/components/shared/resource-table"
+import { AdminErrorAlert } from "@/views/dashboard/admin/shared/common"
+import { ResourceTable } from "@/components/resource-table"
 import {
   BulkDeleteRolesDialog,
   DeleteRoleDialog,
-} from "@/views/dashboard/admin/components/roles/delete-dialogs"
-import { RoleEditorDialog } from "@/views/dashboard/admin/components/roles/editor-dialog"
-import { isSuperAdminRole } from "@/views/dashboard/admin/components/roles/helpers"
-import { RolePermissionDialog } from "@/views/dashboard/admin/components/roles/permissions-dialog"
-import { RoleRowActions } from "@/views/dashboard/admin/components/roles/row-actions"
-import type { RoleDialog } from "@/views/dashboard/admin/components/roles/types"
-import { statusText } from "@/views/dashboard/admin/components/permissions/tree"
+} from "@/views/dashboard/admin/roles/delete-dialogs"
+import { RoleEditorDialog } from "@/views/dashboard/admin/roles/editor-dialog"
+import { isSuperAdminRole } from "@/views/dashboard/admin/roles/helpers"
+import { RolePermissionDialog } from "@/views/dashboard/admin/roles/permissions-dialog"
+import { RoleRowActions } from "@/views/dashboard/admin/roles/row-actions"
+import type { RoleDialog } from "@/views/dashboard/admin/roles/types"
+import { statusText } from "@/views/dashboard/admin/permissions/tree"
 
 export function RolesPanel({
   accessPermissions,

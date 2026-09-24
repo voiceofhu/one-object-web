@@ -2,11 +2,11 @@ import { useObjectTranslation } from "@/local/object"
 import { useQuery } from "@tanstack/react-query"
 import { useSearchParams } from "react-router"
 import { authPermissionsQuery } from "@/views/dashboard/account/permissions-api"
-import { RolesPanel } from "./components/roles"
-import { PermissionsPanel } from "./components/permissions"
-import { UsersPanel } from "./components/users"
-import { LogsPanel } from "./components/logs"
-import { AdminErrorAlert, AdminLoading } from "./components/shared/common"
+import { RolesPanel } from "./roles"
+import { PermissionsPanel } from "./permissions"
+import { UsersPanel } from "./users"
+import { LogsPanel } from "./logs"
+import { AdminErrorAlert, AdminLoading } from "./shared/common"
 const sections: Record<string, string> = {
   users: "object:user:list",
   roles: "object:role:list",

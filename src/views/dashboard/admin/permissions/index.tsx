@@ -15,9 +15,9 @@ import {
   updatePermissionStatus,
   type IdentityPermission,
 } from "@/views/dashboard/admin/api/rbac-api"
-import { DeletePermissionDialog } from "@/views/dashboard/admin/components/permissions/delete-dialog"
-import { PermissionEditorDialog } from "@/views/dashboard/admin/components/permissions/editor-dialog"
-import { PermissionRowActions } from "@/views/dashboard/admin/components/permissions/row-actions"
+import { DeletePermissionDialog } from "@/views/dashboard/admin/permissions/delete-dialog"
+import { PermissionEditorDialog } from "@/views/dashboard/admin/permissions/editor-dialog"
+import { PermissionRowActions } from "@/views/dashboard/admin/permissions/row-actions"
 import {
   buildPermissionTree,
   filterPermissionTree,
@@ -25,9 +25,9 @@ import {
   reorderPermissionItems,
   statusText,
   type PermissionNode,
-} from "@/views/dashboard/admin/components/permissions/tree"
-import type { PermissionEditorState } from "@/views/dashboard/admin/components/permissions/types"
-import { ResourceTable } from "@/views/dashboard/admin/components/shared/resource-table"
+} from "@/views/dashboard/admin/permissions/tree"
+import type { PermissionEditorState } from "@/views/dashboard/admin/permissions/types"
+import { ResourceTable } from "@/components/resource-table"
 
 export function PermissionsPanel({
   accessPermissions,

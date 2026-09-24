@@ -34,14 +34,14 @@ import {
   type IdentityPermission,
   type IdentityPermissionInput,
 } from "@/views/dashboard/admin/api/rbac-api"
-import { AdminErrorAlert } from "@/views/dashboard/admin/components/shared/common"
-import { MenuIconSelect } from "@/views/dashboard/admin/components/permissions/menu-icon-select"
+import { AdminErrorAlert } from "@/views/dashboard/admin/shared/common"
+import { MenuIconSelect } from "@/views/dashboard/admin/permissions/menu-icon-select"
 import {
   buildPermissionTree,
   collectPermissionIds,
   flattenPermissionNodes,
-} from "@/views/dashboard/admin/components/permissions/tree"
-import type { PermissionEditorState } from "@/views/dashboard/admin/components/permissions/types"
+} from "@/views/dashboard/admin/permissions/tree"
+import type { PermissionEditorState } from "@/views/dashboard/admin/permissions/types"
 
 export function PermissionEditorDialog({
   dialog,

@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/input-group"
 
 import { cn } from "@/lib/utils"
-import { getColumnMeta } from "@/views/dashboard/admin/components/shared/resource-table/helpers"
+import { getColumnMeta } from "@/components/resource-table/helpers"
 
 export type ResourceTableFilterOption<TValue extends string> = {
   label: ReactNode
