@@ -14,7 +14,7 @@ import { lazy, Suspense } from "react"
 
 import { Link } from "react-router"
 
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 
 import { useTranslation } from "@/components/providers/language-context"
 

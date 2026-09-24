@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import type { ColumnDef } from "@tanstack/react-table"
 import { format, fromUnixTime } from "date-fns"
-import { useMemo, useState } from "react"
-import { toast } from "sonner"
+import { useEffect, useState } from "react"
+import { toast } from "@/lib/toast"
 import {
   BookOpenIcon,
   RefreshCwIcon,
@@ -14,11 +14,15 @@ import {
 import { useCurrentTime } from "@/hooks/use-current-time"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useTranslation } from "@/components/providers/language-context"
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { DefaultUserAvatar } from "@/components/default-user-avatar"
 import { Badge } from "@/components/ui/badge"
-import { formatKeyTime } from "./format"
+import { formatKeyTime, maskToken } from "./format"
 import { useObjectTranslation } from "@/local/object"
 import { authPermissionsQuery } from "@/views/dashboard/account/permissions-api"
 import { ResourceTable } from "@/views/dashboard/admin/components/shared/resource-table"
+import { TablePagination } from "@/components/table-pagination"
+import { MIN_PAGE_SIZE } from "@/lib/pagination"
 import { Button } from "@/components/ui/button"
 import { CopyButton } from "@/components/ui/copy-button"
 import { Switch } from "@/components/ui/switch"
@@ -59,13 +63,24 @@ export default function KeysPage() {
   const access = useQuery(authPermissionsQuery)
   const permissions = access.data?.permissions ?? []
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
   const [statusFilter, setStatusFilter] = useState<KeyStatus>("all")
+  const [page, setPage] = useState(1)
+  const [pageSize, setPageSize] = useState<number>(MIN_PAGE_SIZE)
   const [dialog, setDialog] = useState<KeyDialogState>(null)
   const [keyToDelete, setKeyToDelete] = useState<AppKey | null>(null)
   const [keyToRotate, setKeyToRotate] = useState<AppKey | null>(null)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search.trim()), 250)
+    return () => clearTimeout(timer)
+  }, [search])
   const query = useQuery({
-    queryKey: ["keys"],
-    queryFn: ({ signal }) => listKeys(signal),
+    queryKey: ["keys", page, pageSize, debouncedSearch, statusFilter],
+    queryFn: ({ signal }) =>
+      listKeys(
+        { page, pageSize, search: debouncedSearch, status: statusFilter },
+        signal,
+      ),
   })
   const canCreate = permissions.includes("object:keys:create")
   const canDeleteKey = permissions.includes("object:keys:revoke")
@@ -73,6 +88,7 @@ export default function KeysPage() {
     mutationFn: deleteKey,
     onSuccess: async () => {
       setKeyToDelete(null)
+      setPage(1)
       await client.invalidateQueries({ queryKey: ["keys"] })
       toast.success(tx("授权已删除"))
     },
@@ -90,6 +106,7 @@ export default function KeysPage() {
   const toggle = useMutation({
     mutationFn: setKeyEnabled,
     onSuccess: async () => {
+      setPage(1)
       await client.invalidateQueries({ queryKey: ["keys"] })
     },
     onError: (error) => toast.error(tx(error.message)),
@@ -112,9 +129,7 @@ export default function KeysPage() {
   const renderToken = (key: AppKey) =>
     key.token ? (
       <div className="flex min-h-11 w-fit max-w-full items-center gap-2 sm:min-h-8">
-        <code className="min-w-0 truncate text-xs" title={key.token}>
-          {key.token}
-        </code>
+        <code className="min-w-0 truncate text-xs">{maskToken(key.token)}</code>
         <CopyButton
           value={key.token}
           variant="ghost"
@@ -128,46 +143,38 @@ export default function KeysPage() {
         {tx("旧 Token 未保存")}
       </span>
     )
-  const rows = useMemo(() => {
-    const keyword = search.trim().toLowerCase()
-    return (query.data?.items ?? []).filter((key) => {
-      const state = keyStatus(key, now)
-      const matchesStatus = statusFilter === "all" || statusFilter === state
-      const matchesSearch =
-        !keyword ||
-        [
-          key.name,
-          key.id,
-          key.token,
-          ...key.scopes,
-          key.expires_at === null ? "" : formatKeyDate(key.expires_at),
-        ]
-          .filter(Boolean)
-          .join(" ")
-          .toLowerCase()
-          .includes(keyword)
-      return matchesStatus && matchesSearch
-    })
-  }, [now, query.data?.items, search, statusFilter])
+  const rows = query.data?.items ?? []
   const columns: ColumnDef<AppKey>[] = [
     {
       accessorKey: "name",
       header: tx("应用名称"),
       cell: ({ row }) => (
         <div className="min-w-0 space-y-1.5 max-sm:w-[calc(100vw-7rem)]">
-          {canCreate ? (
-            <button
-              type="button"
-              className="max-w-full truncate font-medium hover:underline"
-              onClick={() => setDialog({ kind: "edit", key: row.original })}
-            >
-              {row.original.name}
-            </button>
-          ) : (
-            <div className="max-w-64 truncate font-medium">
-              {row.original.name}
-            </div>
-          )}
+          <div className="flex min-w-0 items-center gap-2">
+            <Avatar className="rounded-lg">
+              <AvatarImage
+                src={row.original.logo ?? undefined}
+                alt=""
+                className="rounded-lg object-contain"
+              />
+              <AvatarFallback className="rounded-lg">
+                <DefaultUserAvatar seed={`one-object:app:${row.original.id}`} />
+              </AvatarFallback>
+            </Avatar>
+            {canCreate ? (
+              <button
+                type="button"
+                className="max-w-full truncate font-medium hover:underline"
+                onClick={() => setDialog({ kind: "edit", key: row.original })}
+              >
+                {row.original.name}
+              </button>
+            ) : (
+              <div className="max-w-64 truncate font-medium">
+                {row.original.name}
+              </div>
+            )}
+          </div>
           {row.original.revoked ||
           keyStatus(row.original, now) === "expired" ? (
             <Badge variant="secondary">
@@ -234,6 +241,7 @@ export default function KeysPage() {
               : columns
           }
           data={rows}
+          showPaginationControls={false}
           emptyLabel={tx("暂无应用授权")}
           error={query.error}
           getRowId={(key) => key.id}
@@ -242,8 +250,14 @@ export default function KeysPage() {
           onCreate={canCreate ? () => setDialog({ kind: "create" }) : undefined}
           createLabel={tx("新增授权")}
           onRefresh={() => query.refetch()}
-          onSearchChange={setSearch}
-          onStatusFilterChange={setStatusFilter}
+          onSearchChange={(value) => {
+            setPage(1)
+            setSearch(Array.from(value).slice(0, 100).join(""))
+          }}
+          onStatusFilterChange={(value) => {
+            setPage(1)
+            setStatusFilter(value)
+          }}
           stackedToolbar
           statusFilterControl={isMobile ? "select" : "segmented"}
           renderRowActions={(key) => {
@@ -315,6 +329,18 @@ export default function KeysPage() {
           }
         />
       </div>
+      <TablePagination
+        total={query.data?.total ?? 0}
+        page={page}
+        pageSize={pageSize}
+        onPageChange={setPage}
+        onPageSizeChange={(size) => {
+          setPage(1)
+          setPageSize(size)
+        }}
+        disabled={query.isFetching}
+        zh={locale === "zh-CN"}
+      />
       <KeyDialog
         key={
           dialog?.kind === "edit"
@@ -326,7 +352,10 @@ export default function KeysPage() {
         dialog={dialog}
         permissions={permissions}
         onOpenChange={(open) => {
-          if (!open) setDialog(null)
+          if (!open) {
+            setDialog(null)
+            setPage(1)
+          }
         }}
       />
       <KeyRotateDialog

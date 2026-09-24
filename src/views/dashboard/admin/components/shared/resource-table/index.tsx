@@ -75,7 +75,7 @@ type ResourceTableProps<TData, TFilter extends string = StatusFilter> = {
   onRefresh: () => void
   onCreate?: () => void
   createLabel?: string
-  emptyLabel: string
+  emptyLabel: React.ReactNode
   getRowId: (row: TData) => string
   getSubRows?: (row: TData) => TData[] | undefined
   treeColumnId?: string

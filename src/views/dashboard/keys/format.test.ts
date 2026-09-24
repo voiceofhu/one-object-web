@@ -1,6 +1,6 @@
 import { getUnixTime, subMonths } from "date-fns"
 import { expect, it } from "vitest"
-import { formatKeyTime } from "./format"
+import { formatKeyTime, maskToken } from "./format"
 
 const now = new Date(2026, 8, 8, 12)
 
@@ -27,4 +27,12 @@ it("shows full dates for future timestamps", () => {
   expect(
     formatKeyTime(getUnixTime(new Date(2026, 8, 9, 12)), now, "zh-CN"),
   ).toBe("2026-09-09 12:00")
+})
+
+it("masks tokens without exposing short values", () => {
+  expect(maskToken("ook_1234567890abcdefghijklmnop")).toBe(
+    "ook_1234••••••••mnop",
+  )
+  expect(maskToken("ook_short")).toBe("••••••••")
+  expect(maskToken("")).toBe("••••••••")
 })

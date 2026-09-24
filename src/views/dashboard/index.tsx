@@ -168,8 +168,38 @@ export default function Dashboard() {
               ) : files.data.items.length === 0 ? (
                 <NoItems
                   title={tx("暂无文件")}
-                  description={tx("上传文件后，会在这里显示。")}
-                />
+                  description={tx(
+                    accounts.isSuccess && !accounts.data.items.length
+                      ? "添加厂商账号后，即可接入存储桶并上传文件。"
+                      : storage.isSuccess && !storage.data.items.length
+                        ? "先配置存储桶，再上传文件。"
+                        : "上传文件后，会在这里显示。",
+                  )}
+                >
+                  {accounts.isSuccess &&
+                  !accounts.data.items.length &&
+                  can("object:storage:write") ? (
+                    <Button asChild size="sm">
+                      <Link to="/dashboard/storage?create=1">
+                        {tx("添加厂商账号")}
+                      </Link>
+                    </Button>
+                  ) : storage.isSuccess &&
+                    !storage.data.items.length &&
+                    canBuckets ? (
+                    <Button asChild size="sm">
+                      <Link to="/dashboard/buckets">{tx("配置存储桶")}</Link>
+                    </Button>
+                  ) : can("object:uploads:write") &&
+                    ((!canStorage && !canBuckets) ||
+                      storage.data?.items.some((item) => item.enabled)) ? (
+                    <Button asChild size="sm">
+                      <Link to="/dashboard/files?upload=1">
+                        {tx("上传文件")}
+                      </Link>
+                    </Button>
+                  ) : null}
+                </NoItems>
               ) : (
                 <RecentFiles files={files.data.items.slice(0, 6)} />
               )}

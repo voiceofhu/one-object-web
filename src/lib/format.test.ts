@@ -20,6 +20,19 @@ describe("shared date formatting", () => {
 const now = new Date("2026-06-15T12:00:00Z")
 
 describe("relativeTime", () => {
+  it("shows just now within a minute, including the page clock refresh delay", () => {
+    for (const offset of [-59_000, 0, 29_000, 59_000]) {
+      const created = new Date(now.getTime() + offset)
+      expect(relativeTime(created, now, "zh-CN")).toBe("刚刚")
+      expect(relativeTime(created, now, "en-US")).toBe("just now")
+    }
+    expect(relativeTime(new Date(now.getTime() - 60_000), now, "zh-CN")).toBe(
+      "1 分钟前",
+    )
+    expect(
+      relativeTime(new Date(now.getTime() + 60_000), now, "en-US"),
+    ).not.toBe("just now")
+  })
   it("formats ISO creation timestamps with the existing relative-date rule", () => {
     expect(relativeTime("2026-06-15T11:00:00Z", now, "en-US")).toBe(
       "1 hour ago",

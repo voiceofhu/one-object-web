@@ -18,7 +18,7 @@ import {
   ListIcon,
   UploadIcon,
 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import { ButtonGroup, ButtonGroupSeparator } from "@/components/ui/button-group"
 import {
@@ -372,7 +372,7 @@ export function UploadControl({
         isMobile
           ? undefined
           : (event) => {
-              if (event.pointerType === "mouse") {
+              if (event.pointerType === "mouse" && entries.length > 0) {
                 clearTimeout(closeTimer.current)
                 onOpenChange(true)
               }

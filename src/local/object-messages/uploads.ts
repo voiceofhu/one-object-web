@@ -18,6 +18,7 @@ export const uploads = {
   上传文件夹路径无效: "Invalid upload folder path",
   目标位置已有同名文件或上传任务:
     "A file or upload with this name already exists at the destination",
+  目标对象键已被占用: "The storage object key is already in use",
   "个云端桶吗？仅支持空桶；存在文件、历史版本或未完成分片时会拒绝删除。":
     " cloud buckets? Only empty buckets can be deleted. Files, versions or incomplete multipart uploads prevent deletion.",
   "选择存储桶区域，创建私有桶并接入文件上传。":

@@ -1,6 +1,6 @@
 import { useRef, useState, type ComponentProps, type MouseEvent } from "react"
 import { RefreshCw } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 

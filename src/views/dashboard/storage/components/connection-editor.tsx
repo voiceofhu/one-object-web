@@ -17,7 +17,7 @@ import { useEffect, useState } from "react"
 
 import { CircleHelpIcon, EyeIcon, EyeOffIcon } from "lucide-react"
 
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 
 import { Input } from "@/components/ui/input"
 

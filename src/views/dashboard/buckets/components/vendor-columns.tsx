@@ -11,12 +11,12 @@ export function useVendorColumns(): ColumnDef<StorageAccount>[] {
       accessorKey: "name",
       header: tx("厂商"),
       cell: ({ row: { original: vendor } }) => (
-        <div className="flex min-w-0 items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1.5">
           <img
             src={`/storage-providers/${vendor.provider}.svg`}
             alt=""
             aria-hidden="true"
-            className="size-6 shrink-0 object-contain"
+            className="size-4 shrink-0 object-contain"
           />
           <div className="min-w-0">
             <p className="truncate font-medium" title={vendor.name}>

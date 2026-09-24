@@ -8,7 +8,7 @@ import { objectColumns } from "./object-columns"
 import { NameTooltip } from "./name-tooltip"
 import { useLocalAtom } from "@/hooks/use-local-atom"
 import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import {
   ResponsiveDialog,
@@ -20,9 +20,10 @@ import {
   ResponsiveDialogFooter,
 } from "@/components/ui/responsive-dialog"
 import { deleteStorageObjects } from "../api"
-import { useMemo, useRef } from "react"
+import { useEffect, useMemo, useRef } from "react"
 import { atom, useAtom } from "jotai"
 import { ImagePreviewDialog } from "./image-preview-dialog"
+import { objectDownloadHref } from "../links"
 import { useCurrentTime } from "@/hooks/use-current-time"
 import { Trash2Icon, XIcon } from "lucide-react"
 import { useObjectTranslation } from "@/local/object"
@@ -45,6 +46,7 @@ type ObjectDirectoryProps = {
   items: StorageObjectEntry[]
   view: "folders" | "files"
   onOpenFolder: (prefix: string) => void
+  onUpload?: () => void
 }
 
 const columnClasses: Record<string, string> = {
@@ -63,6 +65,7 @@ export function ObjectDirectory({
   canDelete,
   view,
   onOpenFolder,
+  onUpload,
 }: ObjectDirectoryProps) {
   const tx = useObjectTranslation()
   const { locale } = useTranslation()
@@ -103,6 +106,13 @@ export function ObjectDirectory({
   const previewAtom = useMemo(() => atom<StorageObjectEntry | null>(null), [])
   const [preview, setPreview] = useAtom(previewAtom)
   const previewTrigger = useRef<HTMLAnchorElement | null>(null)
+  const previewRequest = useRef(0)
+  useEffect(
+    () => () => {
+      previewRequest.current += 1
+    },
+    [],
+  )
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table owns row modeling.
   const table = useReactTable({
     data: items,
@@ -116,8 +126,21 @@ export function ObjectDirectory({
       view,
       onOpenFolder,
       onPreview: (item, trigger) => {
-        previewTrigger.current = trigger
-        setPreview(item)
+        const request = ++previewRequest.current
+        const image = new Image()
+        image.src = objectDownloadHref(item.storage_id, item.key)
+        void image.decode().then(
+          () => {
+            if (request !== previewRequest.current) return
+            previewTrigger.current = trigger
+            setPreview(item)
+          },
+          () => {
+            if (request === previewRequest.current) {
+              toast.error(tx("此图片暂时无法预览，请重试或下载查看。"))
+            }
+          },
+        )
       },
       now,
       locale,
@@ -132,7 +155,13 @@ export function ObjectDirectory({
       <NoItems
         title={tx(focusedKey ? "文件不存在或已被删除" : "暂无对象")}
         description={tx("此对象前缀下没有内容，请调整搜索或返回上级目录。")}
-      />
+      >
+        {!focusedKey && onUpload && (
+          <Button size="sm" onClick={onUpload}>
+            {tx("上传文件")}
+          </Button>
+        )}
+      </NoItems>
     )
 
   return (

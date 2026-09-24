@@ -2,6 +2,7 @@ import { json, request } from "@/lib/http"
 export type AppKey = {
   id: string
   name: string
+  logo: string | null
   token: string
   scopes: string[]
   storage_targets: StorageTarget[]
@@ -22,13 +23,25 @@ export const keyScopes = [
 ] as const
 export type AppKeyInput = {
   name: string
+  logo: string | null
   scopes: string[]
   expires_at: number | null
   storage_targets: StorageTarget[]
   load_balance: boolean
 }
-export const listKeys = (signal?: AbortSignal) =>
-  request<{ items: AppKey[] }>("/api/keys", { signal })
+export const listKeys = (
+  params: { page: number; pageSize: number; search: string; status: string },
+  signal?: AbortSignal,
+) =>
+  request<{ items: AppKey[]; total: number }>(
+    `/api/keys?${new URLSearchParams({
+      page: String(params.page),
+      page_size: String(params.pageSize),
+      search: params.search,
+      status: params.status,
+    })}`,
+    { signal },
+  )
 export const createKey = (input: AppKeyInput) =>
   request<{ id: string; token: string }>("/api/keys", json(input))
 export const updateKey = (id: string, input: AppKeyInput) =>

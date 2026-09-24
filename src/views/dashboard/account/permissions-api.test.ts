@@ -75,7 +75,7 @@ it.each(["/keys", "/dashboard/keys", "/authorizations"])(
   "shows the authorization menu for %s",
   (path) => {
     const routes = groupDashboardRoutes([
-      { ...page("2005", path), meta: { title: "授权管理", icon: "key-round" } },
+      { ...page("2005", path), meta: { title: "应用接入", icon: "key-round" } },
     ])
     const groups = buildNavigationGroups({
       user_id: "100",
@@ -87,7 +87,7 @@ it.each(["/keys", "/dashboard/keys", "/authorizations"])(
     })
     expect(groups[0].items[0]).toMatchObject({
       href: "/dashboard/authorizations",
-      label: "授权管理",
+      label: "应用接入",
     })
     expect(
       buildNavigationGroups({
@@ -112,7 +112,7 @@ it("uses distinct icons for authorization and permission management", () => {
     routes: groupDashboardRoutes([
       {
         ...page("2005", "/authorizations"),
-        meta: { title: "授权管理", icon: "key-round" },
+        meta: { title: "应用接入", icon: "key-round" },
       },
       {
         ...page("2023", "/admin/permissions"),

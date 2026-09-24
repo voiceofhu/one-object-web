@@ -13,7 +13,7 @@ import {
 import { listConnections, listAccounts } from "@/views/dashboard/storage/api"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { z } from "zod"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 
 import { useObjectTranslation } from "@/local/object"
 import {
@@ -22,6 +22,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
+import { ImageCropUpload } from "@/components/image-crop-upload"
 import { Input } from "@/components/ui/input"
 import { DialogActionButton } from "@/components/ui/dialog-action-button"
 import {
@@ -38,6 +39,7 @@ import { createKey, keyScopes, updateKey, type AppKey } from "./api"
 import { AdminErrorAlert } from "@/views/dashboard/admin/components/shared/common"
 
 const schema = z.object({
+  logo: z.string().nullable(),
   scopes: z.array(z.string()).min(1, "至少选择一个权限"),
   storage_targets: z
     .array(
@@ -87,6 +89,7 @@ export function KeyDialog({
     resolver: zodResolver(schema),
     defaultValues: {
       name: editing?.name ?? "",
+      logo: editing?.logo ?? null,
       scopes:
         editing?.scopes ??
         ["uploads:write", "files:read"].filter((scope) =>
@@ -104,6 +107,7 @@ export function KeyDialog({
     control: form.control,
     name: "storage_targets",
   })
+  const logo = useWatch({ control: form.control, name: "logo" })
   const scopes = useWatch({ control: form.control, name: "scopes" })
   const mutation = useMutation({
     mutationFn: async (values: Form) => {
@@ -139,7 +143,7 @@ export function KeyDialog({
           <ResponsiveDialogTitle>
             {editing ? tx("编辑授权") : tx("新增授权")}
           </ResponsiveDialogTitle>
-          <ResponsiveDialogDescription>
+          <ResponsiveDialogDescription className="sr-only">
             {editing
               ? tx("修改授权信息不会生成新的 Token。")
               : tx("选择权限和存储桶，Token 默认不过期。")}
@@ -148,28 +152,51 @@ export function KeyDialog({
         <ResponsiveDialogBody className="overflow-y-auto">
           <form
             id="key-editor-form"
+            noValidate
             onSubmit={form.handleSubmit((input) => mutation.mutate(input))}
           >
-            <FieldGroup className="gap-4">
-              <Field data-invalid={!!form.formState.errors.name}>
-                <FieldLabel htmlFor="key-name">{tx("应用名称")}</FieldLabel>
-                <Input
-                  id="key-name"
-                  className="h-11 text-base sm:h-9 sm:text-sm"
-                  autoComplete="off"
-                  maxLength={100}
-                  required
-                  {...form.register("name")}
+            <FieldGroup className="gap-5">
+              <div className="flex items-start gap-3">
+                <ImageCropUpload
+                  value={logo}
+                  seed={`one-object:app:${editing?.id ?? "new"}`}
+                  onChange={(value) =>
+                    form.setValue("logo", value, { shouldDirty: true })
+                  }
+                  disabled={mutation.isPending}
                 />
-                <FieldError>
-                  {form.formState.errors.name?.message
-                    ? tx(form.formState.errors.name.message)
-                    : null}
-                </FieldError>
-              </Field>
+                <Field
+                  className="min-w-0 flex-1"
+                  data-invalid={!!form.formState.errors.name}
+                >
+                  <FieldLabel htmlFor="key-name">
+                    {tx("应用名称")}
+                    <span aria-hidden="true" className="text-destructive">
+                      *
+                    </span>
+                  </FieldLabel>
+                  <Input
+                    id="key-name"
+                    className="h-11 text-base sm:h-9 sm:text-sm"
+                    autoComplete="off"
+                    maxLength={100}
+                    required
+                    aria-invalid={!!form.formState.errors.name}
+                    {...form.register("name")}
+                  />
+                  <FieldError>
+                    {form.formState.errors.name?.message
+                      ? tx(form.formState.errors.name.message)
+                      : null}
+                  </FieldError>
+                </Field>
+              </div>
               <fieldset className="space-y-3">
                 <legend className="text-sm font-medium">
                   {tx("权限范围")}
+                  <span aria-hidden="true" className="ml-1 text-destructive">
+                    *
+                  </span>
                 </legend>
                 <div className="flex flex-wrap gap-x-5 gap-y-2">
                   {keyScopes.map(([scope, label]) => (
@@ -186,7 +213,7 @@ export function KeyDialog({
                             checked
                               ? [...scopes, scope]
                               : scopes.filter((value) => value !== scope),
-                            { shouldValidate: true },
+                            { shouldDirty: true, shouldValidate: true },
                           )
                         }
                       />
@@ -203,10 +230,10 @@ export function KeyDialog({
               <fieldset className="space-y-3">
                 <legend className="text-sm font-medium">
                   {tx("桶与文件夹")}
+                  <span aria-hidden="true" className="ml-1 text-destructive">
+                    *
+                  </span>
                 </legend>
-                <p className="text-xs text-muted-foreground">
-                  {tx("路径默认 one-object/；权重默认 1，全部留空时均分。")}
-                </p>
                 {targets.fields.map((target, index) => (
                   <div
                     key={target.id}
@@ -218,13 +245,17 @@ export function KeyDialog({
                         form.setValue(
                           `storage_targets.${index}.storage_id`,
                           value,
-                          { shouldValidate: true },
+                          { shouldDirty: true, shouldValidate: true },
                         )
                       }
                       disabled={!canReadStorage}
                     >
                       <SelectTrigger
                         aria-label={tx("选择存储桶")}
+                        aria-invalid={
+                          !!form.formState.errors.storage_targets?.[index]
+                            ?.storage_id
+                        }
                         className="col-span-2 w-full min-w-0 max-sm:h-11 sm:col-span-1"
                       >
                         <SelectValue placeholder={tx("选择存储桶")} />
@@ -347,7 +378,7 @@ export function KeyDialog({
           <DialogActionButton
             type="submit"
             form="key-editor-form"
-            disabled={mutation.isPending || (!editing && scopes.length === 0)}
+            disabled={mutation.isPending}
             loading={mutation.isPending}
             loadingText={tx("保存中…")}
           >

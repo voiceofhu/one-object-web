@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { useMemo, useState, type FormEvent } from "react"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 
 import { useTranslation } from "@/components/providers/language-context"
 import { DialogActionButton } from "@/components/ui/dialog-action-button"

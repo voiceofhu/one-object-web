@@ -7,6 +7,7 @@ import {
 import { useEffect, useMemo, useState } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {
+  Link,
   Navigate,
   useLocation,
   useNavigate,
@@ -15,7 +16,7 @@ import {
 } from "react-router"
 import { useForm } from "react-hook-form"
 import { RefreshCwIcon, SearchIcon } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 import { useObjectTranslation } from "@/local/object"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -349,6 +350,12 @@ export default function FilesPage() {
                   focusedKey={focusedKey}
                   view={view}
                   onOpenFolder={openFolder}
+                  onUpload={
+                    selectedConnection.enabled &&
+                    access.data?.permissions.includes("object:uploads:write")
+                      ? () => setUploadOpen(true)
+                      : undefined
+                  }
                 />
               )}
             </div>
@@ -414,8 +421,26 @@ export default function FilesPage() {
               title={tx(
                 requestedStorageId ? "存储桶不存在或无权访问" : "暂无存储桶",
               )}
-              description={tx("请从左侧选择存储桶，或先在桶管理中配置接入。")}
-            />
+              description={tx(
+                !accounts.data.items.length
+                  ? "添加厂商账号后，即可接入存储桶并上传文件。"
+                  : "请从左侧选择存储桶，或先在桶管理中配置接入。",
+              )}
+            >
+              {!connections.data.items.length &&
+                (!accounts.data.items.length &&
+                access.data?.permissions.includes("object:storage:write") ? (
+                  <Button asChild size="sm">
+                    <Link to="/dashboard/storage?create=1">
+                      {tx("添加厂商账号")}
+                    </Link>
+                  </Button>
+                ) : access.data?.permissions.includes("object:bucket:read") ? (
+                  <Button asChild size="sm">
+                    <Link to="/dashboard/buckets">{tx("配置存储桶")}</Link>
+                  </Button>
+                ) : null)}
+            </NoItems>
           </div>
         )}
       </div>

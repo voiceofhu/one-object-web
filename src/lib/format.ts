@@ -22,6 +22,9 @@ export const date = (seconds: number) => dateTime(fromUnixTime(seconds))
 export function relativeTime(value: string | Date, now: Date, locale: Locale) {
   const parsed = typeof value === "string" ? parseISO(value) : value
   if (!isValid(parsed)) return "—"
+  if (Math.abs(now.getTime() - parsed.getTime()) < 60_000) {
+    return locale === "zh-CN" ? "刚刚" : "just now"
+  }
   if (parsed < subMonths(now, 1) || parsed > now) {
     return format(parsed, "yyyy-MM-dd HH:mm")
   }

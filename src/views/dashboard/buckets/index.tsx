@@ -26,7 +26,7 @@ import {
   RefreshCwIcon,
   Trash2Icon,
 } from "lucide-react"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 
 import { Loading, Failure, NoItems } from "@/components/async-state"
 import { Badge } from "@/components/ui/badge"
@@ -349,7 +349,7 @@ function BucketManager({ selectedId }: { selectedId?: string }) {
           >
             <RefreshCwIcon
               className={
-                sync.isPending
+                sync.isPending && sync.variables === accountId
                   ? "animate-spin motion-reduce:animate-none"
                   : undefined
               }
@@ -384,22 +384,21 @@ function BucketManager({ selectedId }: { selectedId?: string }) {
             renderRowActions={(vendor) => {
               const canSync = can("sync") && vendor.enabled
               const syncing = sync.isPending && sync.variables === vendor.id
-              const showSyncButton = syncing || !sync.isPending
               const count = bucketCountLabel(vendor, tx)
               return (
                 <div className="grid h-7 min-w-7 items-center justify-items-center">
                   <span
-                    className={`${canSync && !sync.isPending ? "pointer-events-none" : ""} [grid-area:1/1] text-xs tabular-nums text-muted-foreground transition-opacity ${canSync && !sync.isPending ? "group-hover/vendor-row:opacity-0 group-focus-within/vendor-row:opacity-0 [@media(hover:none)]:opacity-0" : ""} ${syncing ? "opacity-0" : ""}`}
+                    className={`[grid-area:1/1] text-xs tabular-nums text-muted-foreground transition-opacity ${canSync && !sync.isPending ? "group-hover/vendor-row:opacity-0 group-focus-within/vendor-row:opacity-0 [@media(hover:none)]:opacity-0" : ""} ${syncing ? "opacity-0" : ""}`}
                     title={tx("桶数量")}
                   >
                     {count}
                   </span>
-                  {canSync && (
+                  {canSync && (!sync.isPending || syncing) && (
                     <Button
                       type="button"
                       variant="outline"
                       size="icon-sm"
-                      className={`relative z-10 [grid-area:1/1] size-7 pointer-events-none opacity-0 transition-opacity ${showSyncButton && !syncing ? "group-hover/vendor-row:pointer-events-auto group-hover/vendor-row:opacity-100 group-focus-within/vendor-row:pointer-events-auto group-focus-within/vendor-row:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100" : ""} ${syncing ? "pointer-events-auto opacity-100" : ""}`}
+                      className={`relative z-10 [grid-area:1/1] size-7 transition-opacity ${syncing ? "opacity-100" : "pointer-events-none opacity-0 group-hover/vendor-row:pointer-events-auto group-hover/vendor-row:opacity-100 group-focus-within/vendor-row:pointer-events-auto group-focus-within/vendor-row:opacity-100 [@media(hover:none)]:pointer-events-auto [@media(hover:none)]:opacity-100"}`}
                       aria-label={vendor.name + tx(" 同步")}
                       disabled={sync.isPending}
                       aria-busy={syncing}
@@ -448,7 +447,15 @@ function BucketManager({ selectedId }: { selectedId?: string }) {
                     ? "请从厂商列表重新选择。"
                     : "请先在厂商管理中添加账号，然后同步云端桶列表。",
                 )}
-              />
+              >
+                {!accounts.data.items.length && canWriteStorage && (
+                  <Button asChild size="sm">
+                    <Link to="/dashboard/storage?create=1">
+                      {tx("添加厂商账号")}
+                    </Link>
+                  </Button>
+                )}
+              </NoItems>
             </div>
           ) : (
             <>
@@ -458,7 +465,40 @@ function BucketManager({ selectedId }: { selectedId?: string }) {
                 inlineActions
                 columns={columns}
                 data={filteredBuckets}
-                emptyLabel={tx("暂无存储桶")}
+                emptyLabel={
+                  buckets.isSuccess && !buckets.data.items.length ? (
+                    <NoItems
+                      title={tx("暂无存储桶")}
+                      description={tx(
+                        "同步已有存储桶，或创建一个新桶开始使用。",
+                      )}
+                    >
+                      <div className="flex flex-wrap justify-center gap-2">
+                        {can("sync") && account.enabled && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            disabled={sync.isPending}
+                            onClick={() => sync.mutate(accountId)}
+                          >
+                            {tx("同步云端")}
+                          </Button>
+                        )}
+                        {can("create") && account.enabled && (
+                          <Button
+                            size="sm"
+                            disabled={pending}
+                            onClick={() => setEditor("new")}
+                          >
+                            {tx("创建桶")}
+                          </Button>
+                        )}
+                      </div>
+                    </NoItems>
+                  ) : (
+                    tx("暂无存储桶")
+                  )
+                }
                 error={buckets.error}
                 getRowCanSelect={(bucket) =>
                   account.enabled && bucket.cloud_state === "present"
@@ -466,10 +506,7 @@ function BucketManager({ selectedId }: { selectedId?: string }) {
                 getRowId={(bucket) => bucket.id}
                 isBulkDeleting={bulkRemove.isPending}
                 isFetching={
-                  buckets.isFetching ||
-                  sync.isPending ||
-                  toggle.isPending ||
-                  bulkRemove.isPending
+                  buckets.isFetching || toggle.isPending || bulkRemove.isPending
                 }
                 isLoading={buckets.isPending}
                 onCreate={

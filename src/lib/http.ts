@@ -1,8 +1,10 @@
 export class ApiError extends Error {
   status: number
-  constructor(status: number, message: string) {
+  code?: string
+  constructor(status: number, message: string, code?: string) {
     super(message)
     this.status = status
+    this.code = code
   }
 }
 export async function request<T>(
@@ -21,10 +23,12 @@ export async function request<T>(
   if (!response.ok) {
     const data = (await response.json().catch(() => ({}))) as {
       message?: string
+      code?: string
     }
     throw new ApiError(
       response.status,
       data.message || `请求失败（${response.status}）`,
+      data.code,
     )
   }
   return response.status === 204

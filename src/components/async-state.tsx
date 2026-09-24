@@ -1,14 +1,15 @@
+import { useEffect, useId, useRef, type ReactNode } from "react"
 import { useObjectTranslation } from "@/local/object"
-import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import {
   Empty,
+  EmptyContent,
   EmptyHeader,
   EmptyTitle,
   EmptyDescription,
 } from "@/components/ui/empty"
-import { Button } from "@/components/ui/button"
 import { LoadingState } from "@/components/loading-state"
 import { ApiError } from "@/lib/http"
+import { toast } from "@/lib/toast"
 export function Loading() {
   const tx = useObjectTranslation()
 
@@ -22,31 +23,36 @@ export function Failure({
   retry?: () => void
 }) {
   const tx = useObjectTranslation()
+  const id = useId()
+  const retryRef = useRef(retry)
 
-  return (
-    <Alert variant="destructive">
-      <AlertTitle>{tx("请求未完成")}</AlertTitle>
-      <AlertDescription>
-        {tx(error.message)}
-        {error instanceof ApiError && error.status === 401 ? (
-          <Button asChild variant="outline">
-            <a href="/api/auth/oidc/start">{tx("重新登录")}</a>
-          </Button>
-        ) : retry ? (
-          <Button variant="outline" onClick={retry}>
-            {tx("重试")}
-          </Button>
-        ) : null}
-      </AlertDescription>
-    </Alert>
-  )
+  useEffect(() => {
+    retryRef.current = retry
+  }, [retry])
+
+  useEffect(() => {
+    toast.error(tx("请求未完成"), {
+      id,
+      description: `${tx(error.message)}${error instanceof ApiError ? ` (HTTP ${error.status})` : ""}`,
+      action:
+        error instanceof ApiError && error.status === 401
+          ? { label: tx("重新登录"), onClick: () => window.location.assign("/api/auth/oidc/start") }
+          : retryRef.current
+            ? { label: tx("重试"), onClick: () => retryRef.current?.() }
+            : undefined,
+    })
+  }, [error, id, tx])
+
+  return null
 }
 export function NoItems({
   title,
   description,
+  children,
 }: {
   title: string
   description: string
+  children?: ReactNode
 }) {
   return (
     <Empty>
@@ -54,6 +60,7 @@ export function NoItems({
         <EmptyTitle>{title}</EmptyTitle>
         <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
+      {children && <EmptyContent>{children}</EmptyContent>}
     </Empty>
   )
 }

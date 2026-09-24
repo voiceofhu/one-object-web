@@ -1,4 +1,12 @@
 export const core = {
+  添加厂商账号: "Add provider account",
+  配置存储桶: "Set up buckets",
+  "添加厂商账号后，即可接入存储桶并上传文件。":
+    "Add a provider account to connect buckets and upload files.",
+  "同步已有存储桶，或创建一个新桶开始使用。":
+    "Sync existing buckets or create a new bucket to get started.",
+  "先配置存储桶，再上传文件。": "Set up a bucket before uploading files.",
+
   "云端同步失败，请刷新重试": "Cloud sync failed. Refresh to retry.",
   "定位文件：{0}": "Located file: {0}",
   查看所在文件夹: "View containing folder",

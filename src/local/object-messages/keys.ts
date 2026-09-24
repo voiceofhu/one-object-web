@@ -1,4 +1,32 @@
 export const keys = {
+  "请配置唯一且启用的 tigerzh R2 one-object 存储桶":
+    "Configure one enabled tigerzh R2 one-object bucket",
+  应用图标: "Application icon",
+  上传应用图标: "Upload application icon",
+  选择应用图标: "Choose application icon",
+  上传图标: "Upload icon",
+  更换图标: "Change icon",
+  裁剪应用图标: "Crop application icon",
+  "PNG / JPEG / WebP，最大 5 MB": "PNG / JPEG / WebP, up to 5 MB",
+  "拖动图片，调整缩放。": "Drag the image and adjust the zoom.",
+  预览: "Preview",
+  裁剪预览: "Crop preview",
+  缩放: "Zoom",
+  图片缩放: "Image zoom",
+  图片尚未就绪: "The image is not ready yet",
+  "无法处理图片，请重试": "Could not process the image. Try again.",
+  "裁剪失败，请重试": "Could not crop the image. Try again.",
+  "请选择不超过 5 MB 的 PNG、JPEG 或 WebP 图片":
+    "Choose a PNG, JPEG or WebP image up to 5 MB",
+  "无法读取图片，请换一张图片":
+    "Could not read the image. Choose another image.",
+  "图标须为不超过 128 KB 的 PNG 图片":
+    "The icon must be a PNG image up to 128 KB",
+  图标图片无效: "Invalid icon image",
+  图标图片过大: "The icon image is too large",
+  "图标须为有效的 PNG 图片，尺寸不超过 256×256":
+    "The icon must be a valid PNG image up to 256×256",
+
   密钥: "Key",
   授权已删除: "Authorization deleted",
   删除授权: "Delete authorization",

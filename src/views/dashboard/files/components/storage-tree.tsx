@@ -181,7 +181,7 @@ function StorageTreeContent({
                     src={`/storage-providers/${group.provider}.svg`}
                     alt=""
                     aria-hidden="true"
-                    className="size-4 shrink-0 object-contain"
+                    className="size-3.5 shrink-0 object-contain"
                   />
                   <span className="min-w-0 flex-1 truncate">{group.name}</span>
                   <span className="text-xs tabular-nums text-muted-foreground">

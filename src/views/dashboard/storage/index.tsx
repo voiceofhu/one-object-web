@@ -1,3 +1,5 @@
+import { useSearchParams } from "react-router"
+import { NoItems } from "@/components/async-state"
 import { DialogActionButton } from "@/components/ui/dialog-action-button"
 import { useLocalAtom } from "@/hooks/use-local-atom"
 import { ConnectionEditor } from "./components/connection-editor"
@@ -21,7 +23,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { toast } from "sonner"
+import { toast } from "@/lib/toast"
 import { Button } from "@/components/ui/button"
 import {
   ResponsiveDialog,
@@ -52,8 +54,18 @@ type AccountConfirmation = {
 export default function StoragePage() {
   const tx = useObjectTranslation()
 
+  const [params, setParams] = useSearchParams()
   const client = useQueryClient()
   const [editor, setEditor] = useLocalAtom<StorageAccount | "new" | null>(null)
+  const creating = params.get("create") === "1"
+  const closeEditor = () => {
+    setEditor(null)
+    if (creating) {
+      const next = new URLSearchParams(params)
+      next.delete("create")
+      setParams(next, { replace: true })
+    }
+  }
   const [confirmation, setConfirmation] =
     useLocalAtom<AccountConfirmation | null>(null)
   const [search, setSearch] = useLocalAtom("")
@@ -228,7 +240,22 @@ export default function StoragePage() {
         onCreate={canWrite ? () => setEditor("new") : undefined}
         onRowClick={canWrite ? (account) => setEditor(account) : undefined}
         createLabel={tx("新增接入")}
-        emptyLabel={tx("暂无厂商配置")}
+        emptyLabel={
+          query.isSuccess && !query.data.items.length ? (
+            <NoItems
+              title={tx("暂无厂商配置")}
+              description={tx("添加厂商账号后，即可接入存储桶并上传文件。")}
+            >
+              {canWrite && (
+                <Button size="sm" onClick={() => setEditor("new")}>
+                  {tx("添加厂商账号")}
+                </Button>
+              )}
+            </NoItems>
+          ) : (
+            tx("暂无厂商配置")
+          )
+        }
         isBulkDeleting={remove.isPending}
         onBulkDelete={
           canWrite
@@ -292,10 +319,10 @@ export default function StoragePage() {
           </DropdownMenu>
         )}
       />
-      {editor && (
+      {canWrite && (editor || creating) && (
         <ConnectionEditor
-          value={editor}
-          close={() => setEditor(null)}
+          value={editor ?? "new"}
+          close={closeEditor}
           saved={() => void refresh()}
         />
       )}
