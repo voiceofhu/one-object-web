@@ -16,6 +16,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { useTranslation } from "@/components/providers/language-context"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { DefaultUserAvatar } from "@/components/default-user-avatar"
+import { OwnerTag } from "@/components/owner-tag"
 import { Badge } from "@/components/ui/badge"
 import { formatKeyTime, maskToken } from "./format"
 import { useObjectTranslation } from "@/local/object"
@@ -175,6 +176,7 @@ export default function KeysPage() {
               </div>
             )}
           </div>
+          <OwnerTag name={row.original.owner_name} className="block" />
           {row.original.revoked ||
           keyStatus(row.original, now) === "expired" ? (
             <Badge variant="secondary">

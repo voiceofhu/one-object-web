@@ -1,3 +1,4 @@
+import { OwnerTag } from "@/components/owner-tag"
 import { useSearchParams } from "react-router"
 import { NoItems } from "@/components/async-state"
 import { DialogActionButton } from "@/components/ui/dialog-action-button"
@@ -178,6 +179,7 @@ export default function StoragePage() {
               {account.name}
             </span>
           )}
+          <OwnerTag name={account.owner_name} className="shrink-0" />
         </div>
       ),
       meta: { label: tx("厂商名称"), headerClassName: "w-[45%]" },

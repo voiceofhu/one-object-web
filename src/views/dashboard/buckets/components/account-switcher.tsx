@@ -1,3 +1,4 @@
+import { OwnerTag } from "@/components/owner-tag"
 import { useVendorColumns } from "./vendor-columns"
 import { ResourceTable } from "@/components/resource-table"
 import { Badge } from "@/components/ui/badge"
@@ -103,6 +104,7 @@ export function BucketAccountSwitcher({
                     {vendor.name}
                     {!vendor.enabled ? tx("（已停用）") : ""}
                   </span>
+                  <OwnerTag name={vendor.owner_name} className="max-w-24" />
                   <Badge
                     variant="secondary"
                     className="px-1.5 text-[11px] font-normal"

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react"
-import { X } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { SweepShine } from "@/components/sweep-shine"
@@ -100,16 +99,14 @@ export function AppUpdateChecker() {
         aria-live="polite"
         aria-atomic="true"
         aria-label="发现新版本"
-        className="relative animate-in fade-in slide-in-from-bottom-3 bg-card text-card-foreground gap-0 rounded-xl border-0 px-3 py-3 shadow-md ring-1 ring-foreground/5 duration-300 motion-reduce:animate-none"
+        className="relative animate-in gap-0 rounded-xl border-0 bg-card px-3 py-3 shadow-md ring-1 ring-foreground/5 duration-300 fade-in slide-in-from-bottom-3 motion-reduce:animate-none text-card-foreground"
       >
-        <div className="relative pr-32">
-          <div className="min-w-0">
-            <p className="text-sm leading-5 font-semibold">发现新版本</p>
-            <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
-              新版本已经准备好，更新后即可使用。
-            </p>
-          </div>
-          <div className="absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-1">
+        <div className="min-w-0">
+          <p className="text-sm leading-5 font-semibold">发现新版本</p>
+          <p className="mt-0.5 text-xs leading-4 text-muted-foreground">
+            新版本已经准备好，更新后即可使用。
+          </p>
+          <div className="mt-2 flex items-center justify-end gap-2">
             <Button
               type="button"
               size="sm"
@@ -127,14 +124,14 @@ export function AppUpdateChecker() {
             </Button>
             <Button
               type="button"
-              size="icon-sm"
-              variant="ghost"
-              className="size-7 text-muted-foreground/60 hover:text-muted-foreground"
+              size="sm"
+              variant="outline"
+              className="h-7 px-2.5 text-xs"
               onClick={() => setUpdateAvailable(false)}
               disabled={isPending}
-              aria-label="关闭更新提示"
+              aria-label="知道了"
             >
-              <X aria-hidden="true" />
+              知道了
             </Button>
           </div>
         </div>

@@ -10,6 +10,7 @@ export type ObjectFile = {
   storage_id: string
   bucket_name: string
   created_at: number
+  owner_name?: string | null
 }
 export const listFiles = (
   offset: number,

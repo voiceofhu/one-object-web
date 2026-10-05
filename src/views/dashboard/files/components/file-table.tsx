@@ -1,3 +1,4 @@
+import { OwnerTag } from "@/components/owner-tag"
 import { useObjectTranslation } from "@/local/object"
 import { NameTooltip } from "./name-tooltip"
 import { useMemo } from "react"
@@ -48,6 +49,7 @@ export function FileTable({
               name={row.original.original_filename}
               className="max-w-80"
             />
+            <OwnerTag name={row.original.owner_name} className="shrink-0" />
           </span>
         ),
       },

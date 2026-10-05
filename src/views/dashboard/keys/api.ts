@@ -10,6 +10,7 @@ export type AppKey = {
   created_at: number
   expires_at: number | null
   revoked: boolean
+  owner_name?: string | null
 }
 export type StorageTarget = {
   storage_id: string

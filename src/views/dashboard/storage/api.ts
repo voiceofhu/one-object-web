@@ -17,6 +17,7 @@ export type StorageConnection = {
   endpoint: string
   enabled: boolean
   created_at: number
+  owner_name?: string | null
 }
 export type ConnectionInput = {
   name: string

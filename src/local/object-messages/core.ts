@@ -454,4 +454,5 @@ export const core = {
     "This image cannot be previewed right now. Retry or download it to view.",
   "正在加载图片…": "Loading image…",
   图片预览: "Image preview",
+  所属用户: "Owner",
 }
