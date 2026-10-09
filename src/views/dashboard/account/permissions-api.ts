@@ -43,10 +43,7 @@ export const authPermissionsQuery = queryOptions({
     })
     return {
       ...result,
-      routes: [
-        route("home", "仪表盘", "/dashboard"),
-        ...result.routes,
-      ],
+      routes: [route("home", "仪表盘", "/dashboard"), ...result.routes],
     }
   },
 })

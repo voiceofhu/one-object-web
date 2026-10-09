@@ -61,9 +61,7 @@ it("keeps server directories and skips hidden pages", () => {
   const groups = buildNavigationGroups(access([directory]))
   expect(groups).toHaveLength(1)
   expect(groups[0].label).toBe("系统管理")
-  expect(groups[0].items.map((item) => item.href)).toEqual([
-    "/dashboard/users",
-  ])
+  expect(groups[0].items.map((item) => item.href)).toEqual(["/dashboard/users"])
 })
 
 it("uses distinct icons for authorization and permission management", () => {
