@@ -11,7 +11,11 @@ import { LoginPage } from "@/views/login"
 import { authUserQuery } from "@/views/dashboard/account/api"
 import { authPermissionsQuery } from "@/views/dashboard/account/permissions-api"
 const Dashboard = lazy(() => import("@/views/dashboard"))
-const Admin = lazy(() => import("@/views/dashboard/admin"))
+const Users = lazy(() => import("@/views/dashboard/users"))
+const Roles = lazy(() => import("@/views/dashboard/roles"))
+const Permissions = lazy(() => import("@/views/dashboard/permissions"))
+const LoginEvents = lazy(() => import("@/views/dashboard/login-events"))
+const OperationLogs = lazy(() => import("@/views/dashboard/operation-logs"))
 const Account = lazy(() => import("@/views/dashboard/account"))
 const Files = lazy(() => import("@/views/dashboard/files"))
 const Keys = lazy(() => import("@/views/dashboard/keys"))
@@ -25,11 +29,18 @@ function RequirePermission({ code }: { code: string }) {
   if (access.isPending) return <Loading />
   if (access.error) return <Failure error={access.error} />
   return access.data?.permissions.includes(code) ? (
-    <Outlet />
+    <Outlet context={access.data.permissions} />
   ) : (
     <Failure error={new Error(tx("没有此页面的访问权限"))} />
   )
 }
+const adminPages = [
+  ["users", "object:user:list", Users],
+  ["roles", "object:role:list", Roles],
+  ["permissions", "object:permission:list", Permissions],
+  ["login-events", "object:login-log:list", LoginEvents],
+  ["operation-logs", "object:operation-log:list", OperationLogs],
+] as const
 function AuthenticatedApp() {
   const account = useQuery(authUserQuery)
   if (account.isPending)
@@ -57,7 +68,11 @@ function AuthenticatedApp() {
       <Routes>
         <Route path="dashboard" element={<AppShell />}>
           <Route index element={<Dashboard />} />
-          <Route path="admin" element={<Admin />} />
+          {adminPages.map(([path, code, Page]) => (
+            <Route key={path} element={<RequirePermission code={code} />}>
+              <Route path={path} element={<Page />} />
+            </Route>
+          ))}
           <Route path="account" element={<Account />} />
           <Route element={<RequirePermission code="object:files:read" />}>
             <Route path="files">
@@ -65,18 +80,8 @@ function AuthenticatedApp() {
               <Route path=":id/*" element={<Files />} />
             </Route>
           </Route>
-          <Route element={<RequirePermission code="object:uploads:write" />}>
-            <Route
-              path="uploads"
-              element={<Navigate replace to="/dashboard/files?upload=1" />}
-            />
-          </Route>
           <Route element={<RequirePermission code="object:keys:list" />}>
             <Route path="authorizations" element={<Keys />} />
-            <Route
-              path="keys"
-              element={<Navigate replace to="/dashboard/authorizations" />}
-            />
           </Route>
           <Route element={<RequirePermission code="object:storage:read" />}>
             <Route path="storage" element={<Storage />} />
@@ -88,20 +93,6 @@ function AuthenticatedApp() {
             </Route>
           </Route>
         </Route>
-        {[
-          "files",
-          "uploads",
-          "keys",
-          "authorizations",
-          "storage",
-          "buckets",
-        ].map((path) => (
-          <Route
-            key={path}
-            path={path}
-            element={<Navigate replace to={`/dashboard/${path}`} />}
-          />
-        ))}
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </Suspense>

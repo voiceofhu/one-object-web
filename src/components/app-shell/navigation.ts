@@ -38,20 +38,20 @@ const localNavigation: Record<string, { icon: LucideIcon; id: string }> = {
   "/dashboard/authorizations": { icon: KeyRoundIcon, id: "authorizations" },
   "/dashboard/buckets": { icon: DatabaseIcon, id: "buckets" },
   "/dashboard/storage": { icon: Building2Icon, id: "storage" },
-  "/dashboard/admin?section=users": { icon: UsersRoundIcon, id: "admin-users" },
-  "/dashboard/admin?section=roles": {
+  "/dashboard/users": { icon: UsersRoundIcon, id: "admin-users" },
+  "/dashboard/roles": {
     icon: CircleUserRoundIcon,
     id: "admin-roles",
   },
-  "/dashboard/admin?section=permissions": {
+  "/dashboard/permissions": {
     icon: ShieldCheckIcon,
     id: "admin-permissions",
   },
-  "/dashboard/admin?section=login-events": {
+  "/dashboard/login-events": {
     icon: LogInIcon,
     id: "admin-login-events",
   },
-  "/dashboard/admin?section=operation-logs": {
+  "/dashboard/operation-logs": {
     icon: ClipboardListIcon,
     id: "admin-operation-logs",
   },
@@ -111,23 +111,12 @@ function navigationItems(
 export function getActiveNavigation(
   navigation: ReadonlyArray<NavigationItem>,
   pathname: string,
-  search: string,
 ) {
   if (pathname.startsWith("/dashboard/files/")) {
     return navigation.find((item) => item.id === "files") ?? null
   }
   if (pathname.startsWith("/dashboard/buckets/")) {
     return navigation.find((item) => item.id === "buckets") ?? null
-  }
-  if (pathname === "/dashboard/admin") {
-    const section = new URLSearchParams(search).get("section") ?? "users"
-    return (
-      navigation.find(
-        (item) => item.href === `/dashboard/admin?section=${section}`,
-      ) ??
-      navigation.find((item) => item.id === "admin-users") ??
-      null
-    )
   }
 
   return (

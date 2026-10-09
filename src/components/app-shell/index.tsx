@@ -63,11 +63,7 @@ export function AppShell() {
     () => navigationGroups.flatMap((group) => group.items),
     [navigationGroups],
   )
-  const activeNavigation = getActiveNavigation(
-    navigation,
-    location.pathname,
-    location.search,
-  )
+  const activeNavigation = getActiveNavigation(navigation, location.pathname)
   const [visitedIds, setVisitedIds] = useLocalAtom<ReadonlyArray<string>>(() =>
     activeNavigation && activeNavigation.id !== "home"
       ? ["home", activeNavigation.id]
@@ -83,7 +79,9 @@ export function AppShell() {
         : `${location.pathname}${location.search}`
   const isFullBleedResourcePage =
     location.pathname === "/dashboard" ||
-    location.pathname === "/dashboard/admin" ||
+    ["users", "roles", "permissions", "login-events", "operation-logs"].some(
+      (page) => location.pathname === `/dashboard/${page}`,
+    ) ||
     location.pathname === "/dashboard/storage" ||
     location.pathname === "/dashboard/buckets" ||
     location.pathname.startsWith("/dashboard/buckets/") ||

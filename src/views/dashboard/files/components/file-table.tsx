@@ -18,7 +18,10 @@ import {
 } from "@/components/ui/table"
 import { FileActions } from "./file-actions"
 import { FileIcon } from "./file-icon"
-import { bytes, date } from "@/lib/format"
+import { fromUnixTime } from "date-fns"
+import { useTranslation } from "@/components/providers/language-context"
+import { useCurrentTime } from "@/hooks/use-current-time"
+import { bytes, date, relativeTime } from "@/lib/format"
 import type { ObjectFile } from "../api"
 export function FileTable({
   data,
@@ -32,6 +35,8 @@ export function FileTable({
   showBucketColumn?: boolean
 }) {
   const tx = useObjectTranslation()
+  const { locale } = useTranslation()
+  const now = useCurrentTime()
 
   const columns = useMemo<ColumnDef<ObjectFile>[]>(() => {
     const columns: ColumnDef<ObjectFile>[] = [
@@ -73,7 +78,15 @@ export function FileTable({
       {
         accessorKey: "created_at",
         header: tx("上传时间"),
-        cell: ({ row }) => date(row.original.created_at),
+        cell: ({ row }) => (
+          <time
+            className="whitespace-nowrap"
+            dateTime={fromUnixTime(row.original.created_at).toISOString()}
+            title={date(row.original.created_at)}
+          >
+            {relativeTime(fromUnixTime(row.original.created_at), now, locale)}
+          </time>
+        ),
       },
       {
         id: "actions",
@@ -91,7 +104,7 @@ export function FileTable({
     return showBucketColumn
       ? columns
       : columns.filter((_, index) => index !== 1)
-  }, [tx, onDelete, pending, showBucketColumn])
+  }, [tx, onDelete, pending, showBucketColumn, locale, now])
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table exposes stateful helpers by design.
   const table = useReactTable({
     data,

@@ -37,9 +37,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { listKeys, deleteKey, rotateKey, type AppKey } from "./api"
-import { KeyDialog, type KeyDialogState } from "./key-dialog"
-import { KeyDeleteDialog } from "./delete-dialog"
-import { KeyRotateDialog } from "./rotate-dialog"
+import { KeyDialog, type KeyDialogState } from "./components/key-dialog"
+import { KeyDeleteDialog } from "./components/delete-dialog"
+import { KeyRotateDialog } from "./components/rotate-dialog"
 
 type KeyStatus = "all" | "active" | "expired" | "never" | "revoked"
 

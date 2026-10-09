@@ -1,12 +1,9 @@
-import { describe, expect, it } from "vitest"
+import { expect, it } from "vitest"
 import { KeyRoundIcon, ShieldCheckIcon } from "lucide-react"
 import { buildNavigationGroups } from "@/components/app-shell/navigation"
-import {
-  groupDashboardRoutes,
-  type AuthPermissionRoute,
-} from "./permissions-api"
+import type { AuthPermissionRoute, AuthPermissions } from "./permissions-api"
 
-function page(id: string, path: string): AuthPermissionRoute {
+function page(id: string, path: string, icon = "#"): AuthPermissionRoute {
   return {
     id,
     path,
@@ -14,112 +11,68 @@ function page(id: string, path: string): AuthPermissionRoute {
     parent_id: null,
     hidden: false,
     menu_type: "C",
-    meta: { title: id, icon: "#" },
+    meta: { title: id, icon },
   }
 }
 
-describe("dashboard menu groups", () => {
-  it("groups legacy management and log pages without adding unauthorized routes", () => {
-    const routes = groupDashboardRoutes([
-      page("files", "/files"),
-      page("users", "/admin/users"),
-      page("roles", "/admin/roles"),
-      page("login", "/admin/login-logs"),
-      page("operation", "/admin/operation-logs"),
-    ])
-    expect(routes.map((route) => route.meta.title)).toEqual([
-      "files",
-      "系统管理",
-      "审计日志",
-    ])
-    expect(routes[1].children?.map((route) => route.path)).toEqual([
-      "/dashboard/admin?section=users",
-      "/dashboard/admin?section=roles",
-    ])
-    expect(routes[2].children?.map((route) => route.path)).toEqual([
-      "/dashboard/admin?section=login-events",
-      "/dashboard/admin?section=operation-logs",
-    ])
-    expect(
-      routes[1].children?.every((route) => route.parent_id === routes[1].id),
-    ).toBe(true)
-  })
-  it("does not create empty groups for accounts without management access", () => {
-    expect(
-      groupDashboardRoutes([page("files", "/files")]).map((route) => route.id),
-    ).toEqual(["files"])
-  })
-  it("preserves existing server directories and hidden pages", () => {
-    const hidden = {
-      ...page("users", "/admin/users"),
-      hidden: true,
-      parent_id: "custom",
-    }
-    const directory: AuthPermissionRoute = {
-      ...page("custom", ""),
-      menu_type: "M",
-      children: [hidden],
-    }
-    const result = groupDashboardRoutes([directory])
-    expect(result).toHaveLength(1)
-    expect(result[0].id).toBe("custom")
-    expect(result[0].children?.[0]).toMatchObject({
-      hidden: true,
-      parent_id: "custom",
-      path: "/dashboard/admin?section=users",
-    })
-  })
-})
-
-it.each(["/keys", "/dashboard/keys", "/authorizations"])(
-  "shows the authorization menu for %s",
-  (path) => {
-    const routes = groupDashboardRoutes([
-      { ...page("2005", path), meta: { title: "应用接入", icon: "key-round" } },
-    ])
-    const groups = buildNavigationGroups({
-      user_id: "100",
-      super_admin: false,
-      permissions: ["object:keys:list"],
-      roles: [],
-      buttons: [],
-      routes,
-    })
-    expect(groups[0].items[0]).toMatchObject({
-      href: "/dashboard/authorizations",
-      label: "应用接入",
-    })
-    expect(
-      buildNavigationGroups({
-        user_id: "100",
-        super_admin: false,
-        permissions: [],
-        roles: [],
-        buttons: [],
-        routes: [],
-      }),
-    ).toEqual([])
-  },
-)
-
-it("uses distinct icons for authorization and permission management", () => {
-  const navigation = buildNavigationGroups({
+function access(
+  routes: AuthPermissionRoute[],
+  permissions: string[] = [],
+): AuthPermissions {
+  return {
     user_id: "100",
     super_admin: false,
-    permissions: [],
+    permissions,
     roles: [],
     buttons: [],
-    routes: groupDashboardRoutes([
-      {
-        ...page("2005", "/authorizations"),
-        meta: { title: "应用接入", icon: "key-round" },
-      },
-      {
-        ...page("2023", "/admin/permissions"),
-        meta: { title: "权限管理", icon: "key-round" },
-      },
+    routes,
+  }
+}
+
+it("shows the authorization menu", () => {
+  const groups = buildNavigationGroups(
+    access(
+      [
+        {
+          ...page("2005", "/dashboard/authorizations", "key-round"),
+          meta: { title: "应用接入", icon: "key-round" },
+        },
+      ],
+      ["object:keys:list"],
+    ),
+  )
+  expect(groups[0].items[0]).toMatchObject({
+    href: "/dashboard/authorizations",
+    label: "应用接入",
+  })
+  expect(buildNavigationGroups(access([]))).toEqual([])
+})
+
+it("keeps server directories and skips hidden pages", () => {
+  const directory: AuthPermissionRoute = {
+    ...page("1901", ""),
+    menu_type: "M",
+    meta: { title: "系统管理", icon: "settings" },
+    children: [
+      page("2011", "/dashboard/users"),
+      { ...page("2017", "/dashboard/roles"), hidden: true },
+    ],
+  }
+  const groups = buildNavigationGroups(access([directory]))
+  expect(groups).toHaveLength(1)
+  expect(groups[0].label).toBe("系统管理")
+  expect(groups[0].items.map((item) => item.href)).toEqual([
+    "/dashboard/users",
+  ])
+})
+
+it("uses distinct icons for authorization and permission management", () => {
+  const navigation = buildNavigationGroups(
+    access([
+      page("2005", "/dashboard/authorizations", "key-round"),
+      page("2023", "/dashboard/permissions", "key-round"),
     ]),
-  }).flatMap((group) => group.items)
+  ).flatMap((group) => group.items)
 
   expect(navigation.find((item) => item.id === "authorizations")?.icon).toBe(
     KeyRoundIcon,

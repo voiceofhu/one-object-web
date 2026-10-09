@@ -14,13 +14,18 @@ import {
   TableHead,
   TableCell,
 } from "@/components/ui/table"
-import { bytes, date } from "@/lib/format"
+import { fromUnixTime } from "date-fns"
+import { useTranslation } from "@/components/providers/language-context"
+import { useCurrentTime } from "@/hooks/use-current-time"
+import { bytes, date, relativeTime } from "@/lib/format"
 import { useObjectTranslation } from "@/local/object"
 import type { ObjectFile } from "../files/api"
 import { fileLocationHref } from "../files/location"
 
 export function RecentFiles({ files }: { files: ObjectFile[] }) {
   const tx = useObjectTranslation()
+  const { locale } = useTranslation()
+  const now = useCurrentTime()
   const columns: ColumnDef<ObjectFile>[] = [
     {
       accessorKey: "original_filename",
@@ -52,7 +57,15 @@ export function RecentFiles({ files }: { files: ObjectFile[] }) {
     {
       accessorKey: "created_at",
       header: tx("上传时间"),
-      cell: ({ row }) => date(row.original.created_at),
+      cell: ({ row }) => (
+        <time
+          className="whitespace-nowrap"
+          dateTime={fromUnixTime(row.original.created_at).toISOString()}
+          title={date(row.original.created_at)}
+        >
+          {relativeTime(fromUnixTime(row.original.created_at), now, locale)}
+        </time>
+      ),
     },
   ]
   // eslint-disable-next-line react-hooks/incompatible-library -- TanStack Table owns row modeling.

@@ -7,3 +7,10 @@ export const adminQueryKeys = {
   sessions: ["object-admin", "sessions"] as const,
   users: ["object-admin", "users"] as const,
 }
+
+export const rbacQueryKeys = {
+  permissions: ["object-admin", "permissions"] as const,
+  roles: ["object-admin", "roles"] as const,
+  userRoles: (userId: string) =>
+    ["object-admin", "users", userId, "roles"] as const,
+}

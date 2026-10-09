@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 
 import { connectionSchema } from "../schema"
 
-import { ProviderHelp } from "../provider-help"
+import { ProviderHelp } from "./provider-help"
 
 import { AnimatedSegmentedTabs } from "@/components/ui/animated-segmented-tabs"
 

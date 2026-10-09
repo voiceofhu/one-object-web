@@ -37,13 +37,13 @@ Vite 从 package.json 读取应用名称和版本，可使用 `VITE_APP_NAME`、
 管理框架直接迁自 `one-user/web`：AppShell 侧栏与多页签、主题/语言 Provider、ResourceTable、响应式弹窗、角色编辑与权限树管理。品牌、权限前缀、用户资料、接口合同和 Object 模块已改写；不迁移密码、验证码、OAuth 服务端或应用审核模块。
 
 - `/dashboard`：可访问模块入口；`/dashboard/files`（文件与上传）、`keys`、`storage`、`integration` 为 Object 业务。
-- `/dashboard/admin?section=users|roles|permissions|login-events|operation-logs`：通用管理模块。
+- `/dashboard/users|roles|permissions|login-events|operation-logs`：通用管理页面，目录与路由一一对应。
 - `/dashboard/account`：当前统一登录身份。
 - 原 `/files`、`/uploads`、`/keys`、`/storage`、`/integration` 自动跳转，原 Logo、登录入口和 PWA 继续使用。
 
 菜单读取后端有效权限和权限树；前端路由与操作按钮做权限检查，后端仍为授权依据。权限每 30 秒刷新，页面聚焦时也重新读取。用户和日志使用与 One User 相同的表格；每批加载 50 条，支持加载更多，再在已加载数据内筛选和分页。少于 10 条时不显示分页。
 
-`src/views/dashboard/admin/api/rbac-api.ts` 对齐 Object 的 PUT/集合响应合同；用户绑定 One User sub，不在 Object 创建密码。数据时间统一使用 date-fns，页面显示本地时区 `yyyy-MM-dd HH:mm:ss`；构建时间保留毫秒和时区，可继续用 `VITE_BUILD_TIME` 覆盖。
+`src/views/dashboard/{users,roles,permissions}/api.ts` 对齐 Object 的 PUT/集合响应合同；用户绑定 One User sub，不在 Object 创建密码。数据时间统一使用 date-fns，页面显示本地时区 `yyyy-MM-dd HH:mm:ss`；构建时间保留毫秒和时区，可继续用 `VITE_BUILD_TIME` 覆盖。
 
 对象存储菜单包含“厂商接入”和“文件管理”。支持同厂商多个 Bucket；文件列表可按接入筛选，上传时选择已启用的接入。配置密钥不回显，编辑时可保留或成对轮换凭证。上传分片和合并遇到临时错误最多重试三次，新建上传不会自动重试。
 
@@ -53,8 +53,8 @@ Vite 从 package.json 读取应用名称和版本，可使用 `VITE_APP_NAME`、
 
 ## 项目结构与文件限制
 
-- `src/views/dashboard/` 对应控制台路由：account、files、buckets、storage、keys、integration 和 admin。
-- `files/uploads/` 持有上传 API、传输实现、任务类型及任务卡片；保留旧上传 URL 的跳转兼容。
+- `src/views/dashboard/` 对应控制台路由：account、files、buckets、storage、keys、integration、users、roles、permissions、login-events、operation-logs。
+- `files/uploads/` 持有上传 API、传输实现、任务类型及任务卡片。
 - `src/components/app-shell/` 按导航、页签和身份操作拆分；`ui/sidebar/` 保持原公开导出。
 - 页面弹窗和列定义留在各自 `components/`，语言消息按语言及上传职责拆分。
 - `useLocalAtom` 为组件实例建立独立 Jotai 状态；表单、URL、服务端状态仍由各自原有机制管理。
