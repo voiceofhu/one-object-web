@@ -1,6 +1,6 @@
 import { useObjectTranslation } from "@/local/object"
 import { RouteProgressPending } from "@/components/route-progress"
-import { lazy, Suspense } from "react"
+import { lazy, Suspense, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Navigate, Outlet, Route, Routes } from "react-router"
 const AppShell = lazy(async () => ({
@@ -8,6 +8,7 @@ const AppShell = lazy(async () => ({
 }))
 import { Loading, Failure } from "@/components/async-state"
 import { LoginPage } from "@/views/login"
+import { pendingReturnTo, sessionEstablished } from "@/views/login/redirect"
 import { authUserQuery } from "@/views/dashboard/account/api"
 import { authPermissionsQuery } from "@/views/dashboard/account/permissions-api"
 const Dashboard = lazy(() => import("@/views/dashboard"))
@@ -43,6 +44,9 @@ const adminPages = [
 ] as const
 function AuthenticatedApp() {
   const account = useQuery(authUserQuery)
+  useEffect(() => {
+    if (account.data) sessionEstablished()
+  }, [account.data])
   if (account.isPending)
     return (
       <main className="p-8">
@@ -66,6 +70,7 @@ function AuthenticatedApp() {
       }
     >
       <Routes>
+        <Route index element={<Navigate to={pendingReturnTo()} replace />} />
         <Route path="dashboard" element={<AppShell />}>
           <Route index element={<Dashboard />} />
           {adminPages.map(([path, code, Page]) => (

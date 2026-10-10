@@ -45,8 +45,6 @@ export const uploads = {
     "Browser clients should upload through their own application backend. Never embed long-lived application keys in browser code.",
   "创建密钥后，其他应用即可接入统一上传。":
     "Create a key to let other applications use unified uploads.",
-  "统一上传、存储与管理文件，通过 One User 安全登录。":
-    "Upload, store and manage files in one place. Sign in securely with One User.",
   "停用后，该厂商不能用于新上传及云端桶管理；已有文件和未完成上传仍保留。":
     "Disabling prevents new uploads and cloud bucket management. Existing files and incomplete uploads will be retained.",
   "删除所选厂商及其本地桶接入配置，云端桶和对象不受影响。有关联文件或未完成上传时，整批操作将被拒绝。":

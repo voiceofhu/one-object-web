@@ -313,8 +313,8 @@ export const core = {
     "Revoke the key for {0}? The application will lose access.",
   撤销: "Revoke",
   暂无应用密钥: "No application keys",
-  "让每一份文件，都井然有序。": "Every file, in its place.",
-  现在开始: "Get started",
+  "登录未能完成，请确认账号已开通此应用后重新登录。":
+    "Sign-in did not finish. Make sure your account has access to this application, then sign in again.",
   "刷新失败，请重试": "Refresh failed. Please retry.",
   厂商列表已刷新: "Provider list refreshed",
   厂商已停用: "Provider disabled",

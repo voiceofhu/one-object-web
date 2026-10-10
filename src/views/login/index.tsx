@@ -1,49 +1,26 @@
-import { LanguageToggle } from "@/components/language-toggle"
+import { useEffect, useState } from "react"
 import { useObjectTranslation } from "@/local/object"
-import { LogoMark } from "@/components/logo-mark"
+import { Loading } from "@/components/async-state"
 import { Button } from "@/components/ui/button"
-import pkg from "../../../package.json"
+import { recentlyRedirected, startLogin } from "./redirect"
 
 export function LoginPage() {
   const tx = useObjectTranslation()
+  const from = window.location.pathname + window.location.search
+  const [blocked] = useState(recentlyRedirected)
+
+  useEffect(() => {
+    if (!blocked) startLogin(from)
+  }, [blocked, from])
+
+  if (!blocked) return <Loading />
 
   return (
-    <main className="flex min-h-svh w-full items-center justify-center bg-muted px-4 py-10">
-      <section
-        className="flex min-h-72 w-full max-w-md flex-col rounded-2xl bg-white p-6 text-left text-slate-950 sm:p-7"
-        aria-labelledby="login-title"
-      >
-        <div className="flex items-center gap-3">
-          <LogoMark className="size-12" />
-          <div className="min-w-0 flex-1">
-            <h1
-              id="login-title"
-              className="text-xl font-semibold tracking-tight"
-            >
-              {pkg.appName}
-            </h1>
-            <p className="mt-0.5 font-mono text-[11px] text-slate-400">
-              v{__APP_VERSION__}
-            </p>
-          </div>
-          <LanguageToggle />
-        </div>
-        <div className="mt-9 space-y-2">
-          <p className="text-base font-medium text-slate-800">
-            {tx("让每一份文件，都井然有序。")}
-          </p>
-          <p className="max-w-sm text-sm leading-6 text-slate-500">
-            {tx("统一上传、存储与管理文件，通过 One User 安全登录。")}
-          </p>
-        </div>
-        <Button
-          asChild
-          size="lg"
-          className="mt-auto h-11 min-w-32 self-end rounded-md px-5"
-        >
-          <a href="/api/auth/oidc/start">{tx("现在开始")}</a>
-        </Button>
-      </section>
+    <main className="flex min-h-svh flex-col items-center justify-center gap-4 p-4 text-center">
+      <p role="alert" className="text-destructive">
+        {tx("登录未能完成，请确认账号已开通此应用后重新登录。")}
+      </p>
+      <Button onClick={() => startLogin(from)}>{tx("重新登录")}</Button>
     </main>
   )
 }
