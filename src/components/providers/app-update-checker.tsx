@@ -48,7 +48,11 @@ export function AppUpdateChecker() {
       worker.postMessage({
         type: "check",
         source,
-        url: new URL(import.meta.env.BASE_URL, window.location.origin).href,
+        url: new URL(
+          "app-version.json",
+          new URL(import.meta.env.BASE_URL, window.location.origin),
+        ).href,
+        build: __APP_BUILD_ID__,
       })
     }
 
