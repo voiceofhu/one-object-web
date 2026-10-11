@@ -28,6 +28,7 @@ export default defineConfig(({ mode }) => {
       __APP_BUILD_TIME__: JSON.stringify(buildTime),
       __APP_VERSION__: JSON.stringify(appVersion),
       __APP_BUILD_ID__: JSON.stringify(buildId),
+      "import.meta.env.VITE_BUILD_TIME": JSON.stringify(buildTime),
     },
     plugins: [
       react(),
@@ -38,7 +39,7 @@ export default defineConfig(({ mode }) => {
           this.emitFile({
             type: "asset",
             fileName: "app-version.json",
-            source: JSON.stringify({ version: appVersion, build: buildId }),
+            source: JSON.stringify({ build: buildTime }),
           })
         },
         transformIndexHtml: (html) => html.replaceAll("%APP_NAME%", appName),
