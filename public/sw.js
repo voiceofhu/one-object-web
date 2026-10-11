@@ -9,7 +9,7 @@ self.addEventListener("install", (event) => {
       .then((cache) =>
         cache.addAll([
           offlineUrl,
-          new URL("one-object-logo.svg", self.location.href).href,
+          new URL("logo.svg", self.location.href).href,
         ]),
       ),
   )

@@ -2,12 +2,12 @@
   "id": "./",
   "name": "One Object",
   "short_name": "One Object",
-  "description": "统一上传、存储与管理文件",
   "lang": "zh-CN",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f5f5f5",
+  "description": "统一上传、存储与管理文件",
   "theme_color": "#1976d2",
   "icons": [
     {

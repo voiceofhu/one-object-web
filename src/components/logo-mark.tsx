@@ -10,7 +10,7 @@ export function LogoMark({ className }: { className?: string }) {
       )}
     >
       <img
-        src={`${import.meta.env.BASE_URL}one-object-logo.svg`}
+        src={`${import.meta.env.BASE_URL}logo.svg`}
         alt=""
         width={48}
         height={48}

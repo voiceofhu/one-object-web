@@ -154,7 +154,7 @@ export function AppShell() {
               >
                 <Link to="/dashboard" aria-label={t("app.name")}>
                   <img
-                    src="/one-object-logo.svg"
+                    src="/logo.svg"
                     alt=""
                     aria-hidden="true"
                     className="size-6 rounded-md object-contain"
