@@ -1,3 +1,4 @@
+import { apiFetch } from "@/lib/http"
 export class HttpError extends Error {
   readonly status: number
   readonly details: unknown
@@ -48,11 +49,7 @@ async function request<T>(
     headers.set("Content-Type", "application/json")
   }
 
-  const response = await fetch(url, {
-    ...init,
-    credentials: init.credentials ?? "same-origin",
-    headers,
-  })
+  const response = await apiFetch(url, { ...init, headers })
   const body = await parseBody(response)
 
   if (!response.ok) {

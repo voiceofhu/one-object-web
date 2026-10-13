@@ -12,30 +12,33 @@ import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { App } from "./App"
 import "./styles.css"
+import { startDevtoolsGuard } from "@/lib/devtools-guard"
 const client = new QueryClient({
   defaultOptions: { queries: { staleTime: 15_000, retry: 1 } },
 })
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <Provider>
-      <QueryClientProvider client={client}>
-        <LanguageProvider>
-          <ThemeProvider storageKey="one-object:theme">
-            <TooltipProvider>
-              <BuildInfo />
-              <AppUpdateChecker />
-              <BrowserRouter>
-                <RouteProgress />
-                <App />
-              </BrowserRouter>
-              <Toaster richColors />
-            </TooltipProvider>
-          </ThemeProvider>
-        </LanguageProvider>
-      </QueryClientProvider>
-    </Provider>
-  </React.StrictMode>,
-)
+if (startDevtoolsGuard()) {
+  ReactDOM.createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+      <Provider>
+        <QueryClientProvider client={client}>
+          <LanguageProvider>
+            <ThemeProvider storageKey="one-object:theme">
+              <TooltipProvider>
+                <BuildInfo />
+                <AppUpdateChecker />
+                <BrowserRouter>
+                  <RouteProgress />
+                  <App />
+                </BrowserRouter>
+                <Toaster richColors />
+              </TooltipProvider>
+            </ThemeProvider>
+          </LanguageProvider>
+        </QueryClientProvider>
+      </Provider>
+    </React.StrictMode>,
+  )
+}
 
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {

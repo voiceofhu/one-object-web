@@ -1,3 +1,21 @@
+import { createApiFetch } from "@/lib/sealed"
+
+/** Production builds encrypt API calls; `plain` must match the backend `Sealed::plain`. */
+export const apiFetch = createApiFetch({
+  enabled: import.meta.env.MODE === "production",
+  info: "one-object sealed api v1",
+  plain: (pathname) =>
+    [
+      "/api/auth/oidc/start",
+      "/api/auth/oidc/callback",
+      "/api/files/upload",
+      "/api/files/objects/download",
+    ].includes(pathname) ||
+    pathname.startsWith("/api/keys/logos/") ||
+    /^\/api\/files\/[^/]+\/(download|access)$/.test(pathname) ||
+    /^\/api\/uploads\/[^/]+\/(content|parts\/[^/]+)$/.test(pathname),
+})
+
 export class ApiError extends Error {
   status: number
   code?: string
@@ -12,10 +30,8 @@ export async function request<T>(
   init: RequestInit = {},
   timeoutMs = 160_000,
 ): Promise<T> {
-  const response = await fetch(path, {
+  const response = await apiFetch(path, {
     ...init,
-    credentials: "same-origin",
-    cache: "no-store",
     signal: init.signal
       ? AbortSignal.any([init.signal, AbortSignal.timeout(timeoutMs)])
       : AbortSignal.timeout(timeoutMs),

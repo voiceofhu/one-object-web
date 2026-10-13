@@ -24,6 +24,12 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: env.VITE_BASE_URL || "/",
+    build: {
+      rolldownOptions: {
+        // The native DevTools probe needs its breakpoint in production output.
+        output: { minify: { compress: { dropDebugger: false } } },
+      },
+    },
     define: {
       __APP_BUILD_TIME__: JSON.stringify(buildTime),
       __APP_VERSION__: JSON.stringify(appVersion),

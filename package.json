@@ -25,6 +25,7 @@
     "class-variance-authority": "^0.7.1",
     "cn": "^0.3.0",
     "date-fns": "^4.4.0",
+    "disable-devtool": "0.3.9",
     "gsap": "^3.15.0",
     "jotai": "^2.20.3",
     "lucide-react": "^1.47.0",
