@@ -7,9 +7,11 @@
  * client point ‖ server point, info = the product's `info`), so the key never crosses
  * the wire. Every API call is then a `POST /api/sealed` carrying
  * `nonce ‖ AES-GCM({m, p, t, b})` with the key id as associated data; the reply is
- * sealed with the request nonce as associated data. The key lives only in memory.
+ * sealed with the request nonce as associated data, and its own `Content-Type` comes
+ * back in `X-Sealed-Type`. The key lives only in memory.
  */
 const CONTENT_TYPE = "application/vnd.one.sealed"
+const TYPE_HEADER = "X-Sealed-Type"
 const encoder = new TextEncoder()
 const NONCE_LEN = 12
 
@@ -118,7 +120,7 @@ async function keyInvalid(response: Response) {
 /**
  * Returns the product's `fetch` for same-origin `/api/*` paths. Plain paths, Bearer
  * calls, anything outside `/api/`, and every path when disabled use `fetch`; the rest go through the encrypted tunnel and come
- * back as a plain JSON `Response` with the inner status. Gateway refusals pass through
+ * back as a plain `Response` with the inner status and content type. Gateway refusals pass through
  * as is; an unknown or expired key renews the channel and retries once.
  */
 export function createApiFetch({ enabled, info, plain }: ApiFetchOptions) {
@@ -186,7 +188,10 @@ export function createApiFetch({ enabled, info, plain }: ApiFetchOptions) {
       return new Response(opened, {
         status: response.status,
         statusText: response.statusText,
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type":
+            response.headers.get(TYPE_HEADER) ?? "application/json",
+        },
       })
     }
   }

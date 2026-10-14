@@ -95,7 +95,10 @@ function gateway({ clockSkew = 0, expireFirst = false, reply } = {}) {
       ),
     )
     seen.envelopes.push({ keyId, ...envelope })
-    const [status, payload] = reply?.(envelope) ?? [200, { ok: envelope.p }]
+    const [status, payload, type] = reply?.(envelope) ?? [
+      200,
+      { ok: envelope.p },
+    ]
     if (payload === null) return new Response(null, { status })
     const iv = globalThis.crypto.getRandomValues(new Uint8Array(12))
     const sealed = await subtle.encrypt(
@@ -105,7 +108,10 @@ function gateway({ clockSkew = 0, expireFirst = false, reply } = {}) {
     )
     return new Response(Buffer.concat([iv, new Uint8Array(sealed)]), {
       status,
-      headers: { "Content-Type": SEALED },
+      headers: {
+        "Content-Type": SEALED,
+        ...(type === undefined ? {} : { "X-Sealed-Type": type }),
+      },
     })
   }
   return seen
@@ -150,6 +156,17 @@ test("inner statuses survive and empty replies stay empty", async () => {
   assert.deepEqual(await denied.json(), { message: "请先通过 One User 登录" })
   const removed = await apiFetch("/api/admin/roles/3", { method: "DELETE" })
   assert.equal(removed.status, 204)
+})
+
+test("the inner content type is restored from X-Sealed-Type", async () => {
+  const apiFetch = createApiFetch(options)
+  gateway({
+    reply: () => [401, { code: "unauthenticated" }, "application/problem+json"],
+  })
+  const response = await apiFetch("/api/auth/user")
+  assert.equal(response.status, 401)
+  assert.equal(response.headers.get("Content-Type"), "application/problem+json")
+  assert.deepEqual(await response.json(), { code: "unauthenticated" })
 })
 
 test("an expired key renews the channel once and retries the same call", async () => {
