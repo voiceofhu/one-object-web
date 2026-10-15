@@ -80,7 +80,11 @@ export function SessionIdentity({ session }: { session: SessionQuery }) {
         description: error.message,
       }),
     onSuccess: (_data, switchAccount) => {
-      window.location.replace(switchAccount ? "/api/auth/oidc/start" : "/")
+      window.location.replace(
+        switchAccount
+          ? "/api/auth/oidc/start?prompt=select_account"
+          : "/login?prompt=select_account",
+      )
     },
   })
 

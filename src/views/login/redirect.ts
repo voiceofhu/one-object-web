@@ -11,7 +11,12 @@ const isDashboardPath = (path: string | null | undefined): path is string =>
 export function startLogin(returnTo?: string) {
   if (isDashboardPath(returnTo)) sessionStorage.setItem(RETURN_KEY, returnTo)
   sessionStorage.setItem(GUARD_KEY, String(Date.now()))
-  window.location.replace(START_PATH)
+  const selectAccount =
+    new URLSearchParams(window.location.search).get("prompt") ===
+    "select_account"
+  window.location.replace(
+    selectAccount ? `${START_PATH}?prompt=select_account` : START_PATH,
+  )
 }
 
 export function recentlyRedirected() {
