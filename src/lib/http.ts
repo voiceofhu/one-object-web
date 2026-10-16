@@ -1,9 +1,8 @@
-import { createApiFetch } from "@/lib/sealed"
+import { createApiFetch } from "@/lib/oblivious"
 
-/** Production builds encrypt API calls; `plain` must match the backend `Sealed::plain`. */
+/** Production builds send API calls through Oblivious HTTP; `plain` must match the backend `Gateway::plain`. */
 export const apiFetch = createApiFetch({
   enabled: import.meta.env.MODE === "production",
-  info: "one-object sealed api v1",
   plain: (pathname) =>
     [
       "/api/auth/oidc/start",
