@@ -40,13 +40,13 @@
   --color-card: var(--card);
   --color-foreground: var(--foreground);
   --color-background: var(--background);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-sm: calc(var(--radius) * var(--corner-scale) * 0.6);
+  --radius-md: calc(var(--radius) * var(--corner-scale) * 0.8);
+  --radius-lg: calc(var(--radius) * var(--corner-scale));
+  --radius-xl: calc(var(--radius) * var(--corner-scale) * 1.4);
+  --radius-2xl: calc(var(--radius) * var(--corner-scale) * 1.8);
+  --radius-3xl: calc(var(--radius) * var(--corner-scale) * 2.2);
+  --radius-4xl: calc(var(--radius) * var(--corner-scale) * 2.6);
 }
 
 :root {
@@ -121,6 +121,34 @@
 @layer base {
   * {
     @apply border-border outline-ring/50;
+  }
+
+  /*
+   * Apple-style continuous corners. A squircle eases into the straight edge
+   * instead of meeting it with a circular arc; its visible curve starts
+   * further from the corner, so --corner-scale lengthens every radius token
+   * to keep the same visual size. Capsules (pills, switches, avatars) stay
+   * round. Browsers without corner-shape keep plain corners at the original
+   * radii.
+   */
+  @supports (corner-shape: squircle) {
+    * {
+      corner-shape: squircle;
+    }
+
+    :is(
+      .rounded-full,
+      .rounded-4xl,
+      [data-slot="badge"],
+      [data-slot="switch"],
+      [data-slot="switch"] *,
+      [data-slot="avatar"],
+      [data-slot="avatar"] *,
+      .tags-view-chrome,
+      .tags-view-chrome *
+    ) {
+      corner-shape: round;
+    }
   }
 
   body {
@@ -487,5 +515,17 @@
   .tags-view-chrome__label,
   .tags-view-chrome__close {
     min-height: 2rem;
+  }
+}
+
+/* Squircle corners need a longer run-in to read like a circle. Unlayered and
+   last so the @supports value wins; see the corner-shape rule in @layer base. */
+:root {
+  --corner-scale: 1;
+}
+
+@supports (corner-shape: squircle) {
+  :root {
+    --corner-scale: 1.5;
   }
 }
