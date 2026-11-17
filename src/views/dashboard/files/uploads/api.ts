@@ -96,16 +96,20 @@ export async function uploadFile(
       return upload.id
     }
     stage?.("正在上传")
+    let lastPercent = -1
     await retryUpload(
       () =>
-        request(
+        uploadPart(
           `/api/uploads/${upload.id}/content`,
-          {
-            method: "PUT",
-            body: file,
-            signal,
-            headers: { "Content-Type": "application/octet-stream" },
+          file,
+          signal,
+          (sent) => {
+            const percent = Math.floor((sent / file.size) * 99)
+            if (percent === lastPercent) return
+            lastPercent = percent
+            progress(upload.id, percent)
           },
+          () => stage?.("等待云端确认"),
           610_000,
         ),
       signal,
@@ -131,33 +135,72 @@ export async function uploadFile(
   }
   if (upload.status === "completed" && confirmed.size !== upload.total_parts)
     throw new Error("已完成文件缺少校验信息")
-  let sentBytes = state.parts.reduce((sum, part) => sum + part.size, 0)
-  progress(upload.id, Math.floor((sentBytes / file.size) * 99))
-  for (let number = 1; number <= upload.total_parts; number++) {
-    signal.throwIfAborted()
-    if (confirmed.has(number)) continue
+  let doneBytes = state.parts.reduce((sum, part) => sum + part.size, 0)
+  let doneParts = confirmed.size
+  // Bytes handed to the network by in-flight parts; reset when a part is retried.
+  const inflight = new Map<number, number>()
+  let lastPercent = -1
+  const report = () => {
+    let sent = doneBytes
+    for (const bytes of inflight.values()) sent += bytes
+    const percent = Math.floor((Math.min(sent, file.size) / file.size) * 99)
+    if (percent === lastPercent) return
+    lastPercent = percent
+    progress(upload.id, percent)
+  }
+  report()
+  const pending: number[] = []
+  for (let number = 1; number <= upload.total_parts; number++)
+    if (!confirmed.has(number)) pending.push(number)
+  // Parallel parts hide the per-part server→provider hop; one failure stops the rest.
+  const failure = new AbortController()
+  const partSignal = AbortSignal.any([signal, failure.signal])
+  const sendPart = async (number: number) => {
     const chunk = file.slice(
       (number - 1) * upload.part_size,
       Math.min(number * upload.part_size, file.size),
     )
     await retryUpload(() => {
-      stage?.(`传输分片 ${number}/${upload.total_parts}`)
-      progress(upload.id, Math.floor((sentBytes / file.size) * 99))
+      inflight.set(number, 0)
+      report()
       return uploadPart(
         `/api/uploads/${upload.id}/parts/${number}`,
         chunk,
-        signal,
-        (sent) =>
-          progress(
-            upload.id,
-            Math.floor(((sentBytes + sent) / file.size) * 99),
-          ),
-        () => stage?.(`等待云端确认 ${number}/${upload.total_parts}`),
+        partSignal,
+        (sent) => {
+          inflight.set(number, sent)
+          report()
+        },
+        () => {},
       )
-    }, signal)
-    sentBytes += chunk.size
-    progress(upload.id, Math.floor((sentBytes / file.size) * 99))
+    }, partSignal)
+    inflight.delete(number)
+    doneBytes += chunk.size
+    doneParts++
+    stage?.(`传输分片 ${doneParts}/${upload.total_parts}`)
+    report()
   }
+  if (pending.length) stage?.(`传输分片 ${doneParts}/${upload.total_parts}`)
+  const worker = async () => {
+    while (pending.length) {
+      partSignal.throwIfAborted()
+      const number = pending.shift()!
+      try {
+        await sendPart(number)
+      } catch (error) {
+        failure.abort(error)
+        throw error
+      }
+    }
+  }
+  const workers = Array.from(
+    { length: Math.min(PART_CONCURRENCY, pending.length) },
+    worker,
+  )
+  const results = await Promise.allSettled(workers)
+  signal.throwIfAborted()
+  const rejected = results.find((result) => result.status === "rejected")
+  if (rejected) throw failure.signal.reason ?? rejected.reason
   signal.throwIfAborted()
   if (upload.status === "completed") {
     progress(upload.id, 100)
@@ -175,6 +218,8 @@ export async function uploadFile(
   progress(upload.id, 100)
   return upload.id
 }
+
+const PART_CONCURRENCY = 3
 
 // Only retry idempotent part/complete requests. Creation is never automatically replayed.
 async function retryUpload<T>(
