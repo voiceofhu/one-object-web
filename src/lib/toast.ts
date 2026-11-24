@@ -1,14 +1,14 @@
-import { toast as sonnerToast } from "sonner"
+import { toast as oneToast } from "@/components/ui/toast"
 
-export const toast: typeof sonnerToast = Object.assign(
-  (...args: Parameters<typeof sonnerToast>) => sonnerToast(...args),
-  sonnerToast,
+export const toast: typeof oneToast = Object.assign(
+  (...args: Parameters<typeof oneToast>) => oneToast(...args),
+  oneToast,
   {
-    error: (...args: Parameters<typeof sonnerToast.error>) =>
-      sonnerToast.error(args[0], {
+    error: (...args: Parameters<typeof oneToast.error>) =>
+      oneToast.error(args[0], {
         ...args[1],
         duration: Infinity,
-        closeButton: true,
+        dismissible: true,
       }),
   },
 )

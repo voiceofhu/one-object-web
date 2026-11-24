@@ -8,11 +8,18 @@ import ReactDOM from "react-dom/client"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { BrowserRouter } from "react-router"
 import { Provider } from "jotai"
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from "@/components/ui/toast"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { App } from "./App"
 import "./styles.css"
 import { startDevtoolsGuard } from "@/lib/devtools-guard"
+import { useObjectTranslation } from "@/local/object"
+
+function AppToaster() {
+  const tx = useObjectTranslation()
+  return <Toaster labels={{ dismiss: tx("关闭") }} />
+}
+
 const client = new QueryClient({
   defaultOptions: { queries: { staleTime: 15_000, retry: 1 } },
 })
@@ -30,7 +37,7 @@ if (startDevtoolsGuard()) {
                   <RouteProgress />
                   <App />
                 </BrowserRouter>
-                <Toaster richColors />
+                <AppToaster />
               </TooltipProvider>
             </ThemeProvider>
           </LanguageProvider>

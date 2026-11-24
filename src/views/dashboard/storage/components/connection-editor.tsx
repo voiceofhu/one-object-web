@@ -11,22 +11,17 @@ import { ProviderHelp } from "./provider-help"
 
 import { AnimatedSegmentedTabs } from "@/components/ui/animated-segmented-tabs"
 
-import { useForm, useWatch } from "react-hook-form"
+import { Controller, useForm, useWatch } from "react-hook-form"
 
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 
-import { CircleHelpIcon, EyeIcon, EyeOffIcon } from "lucide-react"
+import { CircleHelpIcon } from "lucide-react"
 
 import { toast } from "@/lib/toast"
 
 import { Input } from "@/components/ui/input"
 
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupButton,
-  InputGroupInput,
-} from "@/components/ui/input-group"
+import { AppPasswordInput } from "@/components/app-password-input"
 
 import { Field, FieldLabel, FieldError } from "@/components/ui/field"
 
@@ -111,7 +106,6 @@ export function ConnectionEditor({
   const credentialsUnavailable = Boolean(existing) && credentials.isError
   const credentialsReady =
     !existing || credentials.isSuccess || credentialsUnavailable
-  const [showSecret, setShowSecret] = useState(false)
   const existingIdentity = existing ? endpointIdentity(existing) : ""
   const provider = useWatch({ control: form.control, name: "provider" })
   const save = useMutation({
@@ -419,28 +413,26 @@ export function ConnectionEditor({
                   </Tooltip>
                 </TooltipProvider>
               </div>
-              <InputGroup>
-                <InputGroupInput
-                  id="connection-secret"
-                  aria-invalid={!!form.formState.errors.secret_key}
-                  aria-describedby="connection-secret-error"
-                  type={showSecret ? "text" : "password"}
-                  required={!existing || credentialsUnavailable}
-                  autoComplete="new-password"
-                  disabled={!credentialsReady}
-                  {...form.register("secret_key")}
-                />
-                <InputGroupAddon align="inline-end">
-                  <InputGroupButton
-                    aria-label={tx(showSecret ? "隐藏密码" : "显示密码")}
-                    size="icon-xs"
+              <Controller
+                control={form.control}
+                name="secret_key"
+                render={({ field }) => (
+                  <AppPasswordInput
+                    id="connection-secret"
+                    name={field.name}
+                    value={field.value ?? ""}
+                    onChange={field.onChange}
+                    onBlur={field.onBlur}
+                    aria-invalid={!!form.formState.errors.secret_key}
+                    aria-describedby="connection-secret-error"
+                    required={!existing || credentialsUnavailable}
+                    autoComplete="new-password"
                     disabled={!credentialsReady}
-                    onClick={() => setShowSecret((visible) => !visible)}
-                  >
-                    {showSecret ? <EyeOffIcon /> : <EyeIcon />}
-                  </InputGroupButton>
-                </InputGroupAddon>
-              </InputGroup>
+                    strength={false}
+                    labels={{ toggle: tx("显示密码") }}
+                  />
+                )}
+              />
               <FieldError
                 id="connection-secret-error"
                 errors={[form.formState.errors.secret_key]}

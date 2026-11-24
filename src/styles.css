@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
+@import "./styles/app-password-input.css";
 
 @custom-variant dark (&:is(.dark *));
 

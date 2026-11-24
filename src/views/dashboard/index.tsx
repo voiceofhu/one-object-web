@@ -10,6 +10,7 @@ import {
 } from "lucide-react"
 import { Loading, Failure, NoItems } from "@/components/async-state"
 import { SweepShine } from "@/components/sweep-shine"
+import { AnimatedCounter } from "@/components/ui/animated-counter"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -68,6 +69,8 @@ export default function Dashboard() {
       "—"
     ) : pending ? (
       <SweepShine>{tx("加载中")}</SweepShine>
+    ) : typeof value === "number" ? (
+      <AnimatedCounter value={value} />
     ) : (
       (value ?? "—")
     )
