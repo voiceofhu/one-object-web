@@ -1,7 +1,7 @@
 {
   "name": "one-object-web",
   "private": true,
-  "version": "26.1117.943",
+  "version": "26.1125.1701",
   "type": "module",
   "scripts": {
     "dev": "vite",
