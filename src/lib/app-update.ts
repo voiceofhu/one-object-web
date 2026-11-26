@@ -98,3 +98,23 @@ export function reloadForUpdate() {
   url.searchParams.set("t", Date.now().toString())
   window.location.replace(url.toString())
 }
+
+const SNOOZE_KEY = "app-update:snoozed-on"
+
+/** "稍后提醒": hides the update prompt until the local date changes. */
+export function snoozeUpdateForToday() {
+  try {
+    localStorage.setItem(SNOOZE_KEY, new Date().toDateString())
+  } catch {
+    // Storage may be unavailable (private mode); the prompt just returns sooner.
+  }
+}
+
+/** True while a "稍后提醒" from earlier today is in effect. */
+export function isUpdateSnoozed() {
+  try {
+    return localStorage.getItem(SNOOZE_KEY) === new Date().toDateString()
+  } catch {
+    return false
+  }
+}

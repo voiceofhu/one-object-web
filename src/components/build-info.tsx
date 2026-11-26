@@ -1,28 +1,12 @@
-import { useEffect } from "react"
+import { AppInfo, formatBuildTime } from "@/components/ui/app-info"
 
-export function BuildInfo() {
-  useEffect(() => {
-    const print = (key: string, value: string) => {
-      console.info(`[build-info] ${key}: ${value}`)
-    }
-
-    print("one-object-web", __APP_VERSION__)
-    print("build time", formatBuildTime(__APP_BUILD_TIME__))
-    print("environment", import.meta.env.VITE_APP_ENV)
-  }, [])
-
-  return null
+const info = {
+  "one-object-web": __APP_VERSION__,
+  "build time": formatBuildTime(__APP_BUILD_TIME__, "Asia/Shanghai"),
+  environment: import.meta.env.VITE_APP_ENV,
 }
 
-function formatBuildTime(value: string) {
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) {
-    return value
-  }
-
-  return new Intl.DateTimeFormat("zh-CN", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    timeZone: "Asia/Shanghai",
-  }).format(date)
+// Logs build metadata to the console once; renders nothing.
+export function BuildInfo() {
+  return <AppInfo info={info} />
 }
