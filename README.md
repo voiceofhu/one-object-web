@@ -37,7 +37,7 @@ Vite 从 package.json 读取应用名称和版本，可使用 `VITE_APP_NAME`、
 管理框架直接迁自 `one-user/web`：AppShell 侧栏与多页签、主题/语言 Provider、ResourceTable、响应式弹窗、角色编辑与权限树管理。品牌、权限前缀、用户资料、接口合同和 Object 模块已改写；不迁移密码、验证码、OAuth 服务端或应用审核模块。
 
 - `/dashboard`：可访问模块入口；`/dashboard/files`（文件与上传）、`keys`、`storage`、`integration` 为 Object 业务。
-- `/dashboard/users|roles|permissions|login-events|operation-logs`：通用管理页面，目录与路由一一对应。
+- `/dashboard/users|roles|permissions|operation-logs`：通用管理页面，目录与路由一一对应。
 - `/dashboard/account`：当前统一登录身份。
 - 原 `/files`、`/uploads`、`/keys`、`/storage`、`/integration` 自动跳转，原 Logo、登录入口和 PWA 继续使用。
 
@@ -53,7 +53,7 @@ Vite 从 package.json 读取应用名称和版本，可使用 `VITE_APP_NAME`、
 
 ## 项目结构与文件限制
 
-- `src/views/dashboard/` 对应控制台路由：account、files、buckets、storage、keys、integration、users、roles、permissions、login-events、operation-logs。
+- `src/views/dashboard/` 对应控制台路由：account、files、buckets、storage、keys、integration、users、roles、permissions、operation-logs。
 - `files/uploads/` 持有上传 API、传输实现、任务类型及任务卡片。
 - `src/components/app-shell/` 按导航、页签和身份操作拆分；`ui/sidebar/` 保持原公开导出。
 - 页面弹窗和列定义留在各自 `components/`，语言消息按语言及上传职责拆分。

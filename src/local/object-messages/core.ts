@@ -408,7 +408,6 @@ export const core = {
   用户管理: "Users",
   角色管理: "Roles",
   权限管理: "Permissions",
-  登录日志: "Sign-in logs",
   操作日志: "Operation logs",
   存储: "Storage",
   请选择非空文件: "Select a non-empty file",
@@ -420,8 +419,6 @@ export const core = {
   "完成 {0} / {1}": "Completed {0} / {1}",
   "第 {0} 页 · 当前路径": "Page {0} · Current path",
   "第 {0} 页 · 共 {1} 个文件": "Page {0} · {1} files",
-  "保留最近 7 天的登录日志，由 PostgreSQL 定期清理。":
-    "Sign-in logs are retained for 7 days and periodically cleaned up by PostgreSQL.",
   "保留最近 7 天的操作日志，由 PostgreSQL 定期清理。":
     "Operation logs are retained for 7 days and periodically cleaned up by PostgreSQL.",
   有效天数必须为整数: "Validity must be a whole number of days",

@@ -194,7 +194,6 @@ export const zhCN = {
     "此处只管理规范身份、会话与开放平台应用审核，不授予 One Browser 或 One AMZ 的团队和业务角色。",
   "admin.sections.label": "身份管理区域",
   "admin.sections.users": "用户",
-  "admin.sections.loginEvents": "登录事件",
   "admin.sections.sessions": "Web 会话",
   "admin.sections.operationLogs": "操作日志",
   "admin.sections.oauthApplications": "应用审核",
@@ -279,9 +278,6 @@ export const zhCN = {
   "admin.users.pending": "业务用户管理不在此处",
   "admin.users.pendingDescription":
     "用户自助注册、密码恢复、外部身份绑定与编辑、团队和业务 RBAC 仍为 migration_pending。",
-  "admin.loginEvents.title": "登录事件",
-  "admin.loginEvents.description":
-    "查看最小化的登录结果；接口不返回 login hint、IP 或 User-Agent。",
   "admin.sessions.title": "Web 会话",
   "admin.sessions.description":
     "查看 HttpOnly Cookie 会话；单会话撤销会同时消费其未交换授权码并撤销关联 OIDC/Refresh 凭据。",

@@ -15,7 +15,6 @@ const Dashboard = lazy(() => import("@/views/dashboard"))
 const Users = lazy(() => import("@/views/dashboard/users"))
 const Roles = lazy(() => import("@/views/dashboard/roles"))
 const Permissions = lazy(() => import("@/views/dashboard/permissions"))
-const LoginEvents = lazy(() => import("@/views/dashboard/login-events"))
 const OperationLogs = lazy(() => import("@/views/dashboard/operation-logs"))
 const Account = lazy(() => import("@/views/dashboard/account"))
 const Files = lazy(() => import("@/views/dashboard/files"))
@@ -39,7 +38,6 @@ const adminPages = [
   ["users", "object:user:list", Users],
   ["roles", "object:role:list", Roles],
   ["permissions", "object:permission:list", Permissions],
-  ["login-events", "object:login-log:list", LoginEvents],
   ["operation-logs", "object:operation-log:list", OperationLogs],
 ] as const
 function AuthenticatedApp() {

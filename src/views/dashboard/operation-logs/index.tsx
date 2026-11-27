@@ -4,7 +4,7 @@ import { listOperationLogs } from "./api"
 export default function OperationLogsPage() {
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <LogsPanel kind="operation" list={listOperationLogs} />
+      <LogsPanel list={listOperationLogs} />
     </div>
   )
 }

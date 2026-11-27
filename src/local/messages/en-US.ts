@@ -207,7 +207,6 @@ export const enUS = {
     "This area manages canonical identities, sessions, and OAuth application review. It does not grant One Browser or One AMZ team and business roles.",
   "admin.sections.label": "Identity admin sections",
   "admin.sections.users": "Users",
-  "admin.sections.loginEvents": "Login events",
   "admin.sections.sessions": "Web Sessions",
   "admin.sections.operationLogs": "Operation logs",
   "admin.sections.oauthApplications": "Application review",
@@ -298,9 +297,6 @@ export const enUS = {
   "admin.users.pending": "Business user management is separate",
   "admin.users.pendingDescription":
     "User self-registration, password recovery, external identity linking/editing, teams, and business RBAC remain migration_pending.",
-  "admin.loginEvents.title": "Login events",
-  "admin.loginEvents.description":
-    "Inspect minimized login outcomes. The API excludes login hints, IP addresses, and User-Agent values.",
   "admin.sessions.title": "Web Sessions",
   "admin.sessions.description":
     "Inspect HttpOnly Cookie sessions; revoking one also consumes its outstanding authorization codes and revokes linked OIDC/refresh credentials.",

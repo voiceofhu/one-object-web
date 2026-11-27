@@ -6,7 +6,6 @@ import {
   FilesIcon,
   KeyRoundIcon,
   LayoutDashboardIcon,
-  LogInIcon,
   ShieldCheckIcon,
   UsersRoundIcon,
   type LucideIcon,
@@ -46,10 +45,6 @@ const localNavigation: Record<string, { icon: LucideIcon; id: string }> = {
   "/dashboard/permissions": {
     icon: ShieldCheckIcon,
     id: "admin-permissions",
-  },
-  "/dashboard/login-events": {
-    icon: LogInIcon,
-    id: "admin-login-events",
   },
   "/dashboard/operation-logs": {
     icon: ClipboardListIcon,

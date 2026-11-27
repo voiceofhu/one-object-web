@@ -79,7 +79,7 @@ export function AppShell() {
         : `${location.pathname}${location.search}`
   const isFullBleedResourcePage =
     location.pathname === "/dashboard" ||
-    ["users", "roles", "permissions", "login-events", "operation-logs"].some(
+    ["users", "roles", "permissions", "operation-logs"].some(
       (page) => location.pathname === `/dashboard/${page}`,
     ) ||
     location.pathname === "/dashboard/storage" ||

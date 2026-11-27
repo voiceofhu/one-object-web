@@ -11,19 +11,16 @@ export type Log = {
   owner_sub: string | null
   app_id?: string | null
   status: number
-  success?: boolean
-  method?: string
-  route?: string
-  duration_ms?: number
+  method: string
+  route: string
+  duration_ms: number
   peer_ip: string | null
   created_at: string
 }
 
 export function LogsPanel({
-  kind,
   list,
 }: {
-  kind: "login" | "operation"
   list: (offset: number) => Promise<{ items: Log[]; total: number }>
 }) {
   const tx = useObjectTranslation()
@@ -31,7 +28,7 @@ export function LogsPanel({
   const [search, setSearch] = useState("")
   const [filter, setFilter] = useState<"all" | "success" | "failure">("all")
   const logs = useInfiniteQuery({
-    queryKey: ["object-admin", `${kind}-logs`],
+    queryKey: ["object-admin", "operation-logs"],
     initialPageParam: 0,
     queryFn: ({ pageParam }) => list(pageParam),
     getNextPageParam: (page, all) => {
@@ -46,13 +43,9 @@ export function LogsPanel({
         header: tx("操作人"),
         cell: ({ getValue }) => getValue() || tx("未验证身份"),
       },
-      ...(kind === "operation"
-        ? [
-            { accessorKey: "method", header: tx("请求方式") },
-            { accessorKey: "route", header: tx("操作路径") },
-            { accessorKey: "duration_ms", header: tx("耗时 (ms)") },
-          ]
-        : []),
+      { accessorKey: "method", header: tx("请求方式") },
+      { accessorKey: "route", header: tx("操作路径") },
+      { accessorKey: "duration_ms", header: tx("耗时 (ms)") },
       {
         accessorKey: "status",
         header: tx("结果"),
@@ -76,7 +69,7 @@ export function LogsPanel({
         cell: ({ getValue }) => formatAdminTime(getValue<string>()),
       },
     ],
-    [tx, kind],
+    [tx],
   )
   const data = useMemo(
     () =>
@@ -86,7 +79,7 @@ export function LogsPanel({
           (l) =>
             (filter === "all" ||
               (filter === "success" ? l.status < 400 : l.status >= 400)) &&
-            `${l.owner_sub || ""} ${l.route || ""} ${l.peer_ip || ""}`
+            `${l.owner_sub || ""} ${l.route} ${l.peer_ip || ""}`
               .toLowerCase()
               .includes(search.toLowerCase()),
         ) || [],
@@ -95,11 +88,7 @@ export function LogsPanel({
   return (
     <>
       <p className="px-5 py-3 text-xs text-muted-foreground">
-        {tx(
-          kind === "login"
-            ? "保留最近 7 天的登录日志，由 PostgreSQL 定期清理。"
-            : "保留最近 7 天的操作日志，由 PostgreSQL 定期清理。",
-        )}
+        {tx("保留最近 7 天的操作日志，由 PostgreSQL 定期清理。")}
       </p>
       <ResourceTable
         data={data}
